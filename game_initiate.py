@@ -1,30 +1,6 @@
 from game_engine import *
 from Tkinter import *
 
-"""###NEEDS WORK
-#GUI Setup
-root = Tk()
-
-text_to_display = StringVar()
-description="TEST"
-text_to_display.set(description)
-
-label = Label(root, textvariable = text_to_display, width=100, bg="black",
-	fg="white", wraplength=400, anchor="n", font="helvetica")
-label.pack(side=TOP)
-
-entry = Entry(root, width=80)
-entry.pack(side=LEFT)
-
-def enter():
-	description = entry.get()
-	text_to_display.set(description)
-	root.update_idletasks()
-	
-button = Button(root, text="ENTER",command=enter, width=20)
-button.pack(side=RIGHT)
-"""
-
 #Game Initiation
 game_status = "Play"
 scene.change_to(0)
