@@ -1,13 +1,10 @@
-import math
-import random
+#IMPORT CLASS-INDEPENDENT DATABASES:
+from game_universal_functions import *
 from scene_database import *
-from item_database import *
 from enemy_database import *
+from game_database_cluster import *
 
 #CORE FUNCTIONS
-def d(x):
-	return int(round((x-1)*random.random())+1)
-	
 def experience_per_level(level):
 	if level==0: return 1 #Prevents pre-mature level-up in character construction.
 	else: return 10*level+5*(level-1)
@@ -113,7 +110,6 @@ class Control(object):
 				self.description = ("An old man approaches you out of the forest and hands you some red potions."+
 				"\n\"Take these for the road, friend.\"")
 				self.ask_question=True				
-			print self.game_path
 		elif (plot_point==2):
 			if "Cardinal Directions" in player.knowledge:
 				self.options += ["Travel West", "Travel East"]
@@ -177,7 +173,7 @@ class Control(object):
 			pass
 		elif (plot_point==8):
 			player.knowledge = player.knowledge.union({"Cardinal Directions"})
-		elif (plot_point==101):###TO BE CHANGED
+		elif (plot_point==101):
 			self.scene="54,48"		
 		"""GENERAL TOWN OPTIONS"""
 		#Shopping Container
@@ -192,7 +188,7 @@ class Control(object):
 		#Update game log while keeping most recent events closer to the head of the list.
 		self.game_path.insert(0,plot_point)
 
-class Shop(object):###NEED TO TEST
+class Shop(object):
 	def __init__(self):
 		self.inventory 		= [] #Note: contains only names of items.
 		self.buy_quantities = [] #How many of each item bought per purchase.
@@ -341,6 +337,7 @@ class Shop(object):###NEED TO TEST
 						break								
 			else:
 				print "That is not a valid response."
+				
 class Arena(object):
 	def __init__(self):
 		self.bet_range  		= [0,0] #[Minimum Bet, Maximum Bet]
@@ -615,10 +612,8 @@ class Character(object):
 			for i in self.inventory:
 				if item==i[0]: in_inventory=True
 			assert(in_inventory==True) #IE: If item is in inventory:
-			
 			item_details[item][0](item)
 			self.refresh_stats()
-	
 		except:
 			print "You can't use what you don't have!"	
 	def inventory_add(self,item, item_quantity=1):
@@ -703,7 +698,6 @@ class Monster(object):
 		self.AC				= temp[3]
 		
 		self.loot			= gen_enemy_loot(self.name)
-		###ADD TO LIST AFTER CONSTRUCTION
 		global live_enemies #Adds enemy to list of living enemies
 		live_enemies		+= [self] 
 		
@@ -713,7 +707,7 @@ class Monster(object):
 		
 		if attack_roll>=self.AC:
 			self.hp -= damage
-			print "\nYou do " + str(damage) + " damage to " + self.name + "."
+			print "\nYou do " + str(damage) + " damage to the " + self.name + "."
 		else:
 			print "\n"+generate_fight_sequence(scene.fight_style).format(self.name)
 		
@@ -722,37 +716,11 @@ class Monster(object):
 			print generate_fight_sequence("enemy_dead").format(self.name)
 			live_enemies.remove(self)
 
-#MINI-DATABASES------------------------------------------------------
-def	race_modifications(race):
-	#stat_names = ["Strength", "Dexterity","Constitution", "Wisdom", "Intelligence", "Charisma"]
-	return {
-	"Elf": [-2,0,-1,1,2,0],
-	"Orc": [3,0,2,-1,-1,-2],
-	"Human": [0,0,0,0,0,0],
-	"Dwarf": [2,0,2,0,0,-1],
-	"Gnome": [-2,2,-2,0,1,0],
-	"Bear": [5,-2,2,-1,-2,-4],
-	"Goblin": [1,1,0,-1,0,1],
-	}[race]
-
-def	class_modifications(cclass): #Class only modifies hit-die.
-	return {
-	"Fighter": 10,
-	"Ranger": 8,
-	"Wizard": 4,
-	"Rogue": 6,
-	"Bard": 6,
-	"Barbarian": 12,
-	}[cclass]		
-
 #Gameplay Functions:
 def pop_experience(enemy):
 	effective_intelligence_bonus = enemy.hp_max+player.ability_modifiers[4]
 	experience_earned = (enemy.level * effective_intelligence_bonus)/player.level
-	
-	if experience_earned < 1:
-		experience_earned = 1
-	
+	if experience_earned < 1: experience_earned = 1
 	return experience_earned
 	
 def collect_loot():
@@ -1052,5 +1020,8 @@ player = Character()
 scene = Control()
 shop = Shop()
 arena = Arena()
+
+#IMPORT CLASS-DEPENDENT DATABASES:
+from item_database import *
 
 ###DEVELOPMENT MODIFICATIONS

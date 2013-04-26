@@ -1,5 +1,4 @@
 from game_engine import *
-from Tkinter import *
 
 #Game Initiation
 game_status = "Play"

@@ -1,28 +1,37 @@
+from game_universal_functions import *
+from game_engine import player #Allow the 'player' to be directly modified.
+
 #TYPE FUNCTIONS:
 #	Responsible for stat changes.
+
 def weapon(item):	
-	player.active_ammo = "None"
-	player.eq_ammo	= "None"
-	
+	print "4"###
+	player.active_ammo  = "None"
+	print "4.1"###
+	player.eq_ammo		= "None"
+	print "4.2"###
 	if player.eq_weapon==item:
 		player.hand_1 = "Free"
 		if player.eq_shield=="None":
 			player.hand_2 = "Free"
 		player.eq_weapon="None"
 		player.attack_bonus_weapon	= 0
-		player.attack_damage_weapon 	= 0
+		player.attack_damage_weapon = 0
 		player.eq_ammo				= "None"
-		player.attack_bonus_ammo 		= 0
+		player.attack_bonus_ammo 	= 0
 		player.attack_damage_ammo 	= 0
 		print "You unequipped the {}.".format(item)
 	elif (player.hand_2=="Busy" and (item in weapons_2h)):
 		print "You need another hand free to equip your {}!".format(item)
 	else:
+		print "5"###
 		player.eq_weapon=item
 		player.hand_1 = "Busy"
+		print "6"###
 		if player.eq_shield=="None" and not (player.eq_weapon in weapons_2h):
 			player.hand_2 = "Free"
 		if item=="Rusty Iron Sword":
+			print "7"###
 			player.attack_bonus_weapon  = 1
 			player.attack_damage_weapon = 4
 		if item=="Iron Sword":
@@ -136,7 +145,7 @@ def useable(item):
 #"ITEM" :[type, value] 
 item_details = {
 	"Rusty Iron Sword"		:[weapon,5],
-	"Iron Sword"			:[weapon,101],
+	"Iron Sword"			:[weapon,50],
 	"Iron Dagger"			:[weapon,5],
 	"Silver Dagger"			:[weapon,350],
 	"Rapier"				:[weapon,20],
@@ -146,7 +155,7 @@ item_details = {
 	"Steel Claymore"		:[weapon,400],
 	"Iron War Axe"			:[weapon,55],
 	"Iron Battle Axe"		:[weapon,45],
-	"Steel Halberd"			:[weapon,4101],
+	"Steel Halberd"			:[weapon,4100],
 	"Wooden Spear"			:[weapon,3],
 	"Long Spear"			:[weapon,9],
 	"Short Spear"			:[weapon,15],
