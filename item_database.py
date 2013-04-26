@@ -5,11 +5,8 @@ from game_engine import player #Allow the 'player' to be directly modified.
 #	Responsible for stat changes.
 
 def weapon(item):	
-	print "4"###
 	player.active_ammo  = "None"
-	print "4.1"###
 	player.eq_ammo		= "None"
-	print "4.2"###
 	if player.eq_weapon==item:
 		player.hand_1 = "Free"
 		if player.eq_shield=="None":
@@ -24,14 +21,11 @@ def weapon(item):
 	elif (player.hand_2=="Busy" and (item in weapons_2h)):
 		print "You need another hand free to equip your {}!".format(item)
 	else:
-		print "5"###
 		player.eq_weapon=item
 		player.hand_1 = "Busy"
-		print "6"###
 		if player.eq_shield=="None" and not (player.eq_weapon in weapons_2h):
 			player.hand_2 = "Free"
 		if item=="Rusty Iron Sword":
-			print "7"###
 			player.attack_bonus_weapon  = 1
 			player.attack_damage_weapon = 4
 		if item=="Iron Sword":
@@ -39,14 +33,14 @@ def weapon(item):
 			player.attack_damage_weapon = 6
 		if player.hand_2=="Free":
 			if item=="Iron Bastard Sword":
-				player.hand_2 = "Busy"
+				player.hand_2 				= "Busy"
 				player.attack_bonus_weapon  = 3
 				player.attack_damage_weapon = 9
 			if item=="Cracked Wooden Bow":
-				player.hand_2 = "Busy"
+				player.hand_2 				= "Busy"
 				player.attack_bonus_weapon  = 2
 				player.attack_damage_weapon = 3
-				player.active_ammo = "Arrow"
+				player.active_ammo 			= "Arrow"
 		print "You equipped the " + item + "."
 		
 def ammo(item):	

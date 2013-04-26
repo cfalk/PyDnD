@@ -3,7 +3,8 @@
 #
 #NAMING SCHEME:
 #	x.y represents sub-options of scene x
-#	10x represents a town, arena, or shop
+#	1x1 represents a town as 'x'
+#	1xy represents a town option (eg, arena or shop) as 'y'
 #	20x represents a dungeon
 scene_database = {
 	0  :["You wake up to find your clothes soaked and torn.\n"+
@@ -41,20 +42,34 @@ scene_database = {
 		["Explore the Obvious Waterfall Dungeon", "Turn Around"], [201,5], "51,49"],
 	7  :["There are a few wooden huts scattered around, but the camp looks empty.",
 		["Search for Loot", "Leave the Camp"], [7.1, 5], "53,49"],
-	7.1:["The camp is silent -- spare the sound of the crackling fire.",
+	7.1:["The camp is silent -- spare the sound of the crackling fire.",###LOOT TEH CAMP
 		["Leave the Camp"], [5], "53,49_looted"],
 	8  :["You come across a sign: \"TOWNINGTON (EAST), BANDITS (NORTH)\".",
 		["Go North", "Go East"], [4, 9], "52,51"],
 	9  :["A road leads to the East; you suspect it goes to Townington. There is a clearing to the South.",
 		["Go East", "Go South"], [12, 10], "53,51"],
+	10  :["It turns out the clearing is not that clear; there are trees everywhere and smoke emanating from the South.",
+		["Go North", "Go South", "Go East"], [9, 17, 11], "52,53"],
+	11  :["You find a watering well. It seems to be pondering its existence -- or so the splashing from inside implies.",
+		["Peer into the Well", "Go West", "Go East", "Go North"], [11.1, 10, 12, 15], "52,54"],
 	12  :["You come to another crossroads. To the North you can see smoke.",
 		["Go North", "Go South", "Go East"], [13, 11, 9], "54,51"],
 	13  :["There is a large guard tower on the eastern side of the road. You can hear guards yelling inside.",
 		["Go North", "Go South", "Knock on the Tower Door"], [14, 12, 17], "54,50"],
 	14  :["You arrive at the front gate of Townington. You can see a burly man arm wrestling himself outside a nearby inn.",
 		["Explore the Town", "Leave Townington", "Approach the Man"], [101, 13, 18], "54,49"],
+	15  :["The trees to the North seem especially dense. Perhaps the Game Master is not the most clever world designer.",
+		["Go North", "Go West", "Try to Materialize a Diamond"], [16, 11, 15.1], "52,55"],
+	16  :["Surprisingly, you find nothing interesting here, just some generic pine trees -- wait... nope. Boring.",
+		["Go South", "Investigate an obnoxious-looking rock."], [15, 16.1], "51,55"],
+	16.1:["You find a cave that you could squeeze into...",###SPOT CHECK?
+		["Seriously? Nope. Turn Around.", "Squeeze in..."], [16, 111], "51,55,searched"],
+	17  :["The silence of the camp seems supernatural. *crash of thunder*", ###BANDIT CAMP (DUNGEON)
+		["Explore the Camp", "Leave the Camp.", "Loot the Camp."], [17.1, 17.2, 17.3], "54,49"],
 	101 :["You enter the glorious public district of Townington!",
 		["Find the Arena", "Find a Shop","Leave the Public District"], [103, 102, 14], "54,48"],
+	111 :["You enter the hidden underground city of the mole-people.",###SHOP/ARENA
+		["Find an Arena", "Find a Shop","Return to the Surface."], [113, 112, 16], "50,55"],
 }
 	
 def gather_scene_info(plot_point):

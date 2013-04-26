@@ -173,16 +173,29 @@ class Control(object):
 			pass
 		elif (plot_point==8):
 			player.knowledge = player.knowledge.union({"Cardinal Directions"})
-		elif (plot_point==101):
-			self.scene="54,48"		
+		elif (plot_point==11.1):
+			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
+			if (spot_check>=8):
+				self.description += ("You notice your bag is still attached to your belt!\n")
+			if (spot_check>=12):
+				self.description += "You believe you saw something move amidst the shadows of some trees.\n"
+				self.options +=["Call Out"]
+			self.description += ("(Spot check of: "+str(spot_check) + ")")
+
 		"""GENERAL TOWN OPTIONS"""
 		#Shopping Container
 		if (plot_point==102): #"54,48"
 			shop.change_to("Townington Emporium")
 			shop.activate()
+		elif (plot_point==112): #"55,50"
+			shop.change_to("Mole Forge")
+			shop.activate()
 		#Arena Container
 		if (plot_point==103): #"54,48"
 			arena.change_to("Townington Fight Club")
+			arena.activate()
+		if (plot_point==113): #"55,50"
+			arena.change_to("Mole Arena of Death")
 			arena.activate()
 				
 		#Update game log while keeping most recent events closer to the head of the list.
@@ -196,13 +209,18 @@ class Shop(object):
 		self.charisma_score = 0
 		self.name 			= "temp"
 		
-		
 	def change_to(self,shop_id):
 		if shop_id == "Townington Emporium":
 			self.inventory		=["Rusty Iron Sword", "Iron Sword", "Cracked Wooden Bow", "Stone Arrow", "Red Potion"]
 			self.buy_quantities	=[1,1,1,2,1]
 			self.prices			=["D","D","D","D",5]
 			self.charisma_score	=15
+			self.name 			= shop_id
+		elif shop_id == "Mole Forge":###Make Awesome.
+			self.inventory		=["Steel Bastard Sword", "Rapier", "Cracked Wooden Bow", "Stone Arrow", "Red Potion"]
+			self.buy_quantities	=[1,1,1,2,1]
+			self.prices			=["D" for i in range(len(self.inventory))] #All items default pricing
+			self.charisma_score	=20
 			self.name 			= shop_id
 		else:
 			raise Exception("Invalid shop_id")
@@ -350,6 +368,11 @@ class Arena(object):
 			self.bet_range  		= [1,15] 
 			self.chal_rating_max	= 5
 			self.enemy_quantity_lim = 3
+			self.name				= arena_id
+		elif arena_id == "Mole Arena of Death":
+			self.bet_range  		= [20,100] 
+			self.chal_rating_max	= 10
+			self.enemy_quantity_lim = 10
 			self.name				= arena_id
 		else:
 			raise Exception("Invalid arena_id")
@@ -901,36 +924,36 @@ def generate_fight_sequence(mode):
 		return {
 		1:"-You dodge {0}'s attack!",
 		2:"-{0} knicks you, but it's only a flesh wound.",
-		3:"-You jump out of {0}'s blow!",
-		4:"-{0} misses!",
-		5:"-{0}'s attack falls short!",
+		3:"-You jump out of the {0}'s blow!",
+		4:"-The {0} misses!",
+		5:"-The {0}'s attack falls short!",
 		}[temp]
 	if (mode == "char_melee"):
 		temp = d(5)
 		return {
 		1:"-Your attack misses!",
-		2:"-{0} dodges your attack!",
-		3:"-Your attack is blocked by {0}!",
-		4:"-{0} jumps out of your line of attack.",
-		5:"-{0} side-steps!",
+		2:"-The {0} dodges your attack!",
+		3:"-Your attack is blocked by the {0}!",
+		4:"-The {0} jumps out of your line of attack.",
+		5:"-The {0} side-steps!",
 		}[temp]
 	if (mode == "char_ranged"):
 		temp = d(6)
 		return {
 		1:"-Your attack misses!",
 		2:"-{0} dodges your attack!",
-		3:"-Your shot flies over {0}'s head!",
-		4:"-{0} jumps out of your line of fire.",
-		5:"-{0} side-steps and your shot misses!",
+		3:"-Your shot flies over the {0}'s head!",
+		4:"-The {0} jumps out of your line of fire.",
+		5:"-The {0} side-steps and your shot misses!",
 		6:"Your attack lands on the ground a few feet from the {0}.",
 		}[temp]
 	if (mode == "enemy_dead"):
 		temp = d(4)
 		return {
-		1:"-You fatally wound {0}",
-		2:"-{0} falls to the ground.",
-		3:"-{0} collapses under your blow!",
-		4:"-{0} clutches his wound and dies.",
+		1:"-You fatally wound the {0}",
+		2:"-The {0} falls to the ground.",
+		3:"-The {0} collapses under your blow!",
+		4:"-The {0} clutches his wound and dies.",
 		} [temp]
 	if (mode == "pre_battle"):
 		if (len(live_enemies)==1):
@@ -952,12 +975,12 @@ def generate_fight_sequence(mode):
 		temp = d(6)
 		temp2 = d(len(live_enemies)-1)-1
 		return {
-		1:"-{0} runs at you!".format(live_enemies[temp2].name),
-		2:"-{0} eyes you menacingly...".format(live_enemies[temp2].name),
-		3:"-You throw a mean look at {0}.".format(live_enemies[temp2].name),
-		4:"-{0} tries to flank you!".format(live_enemies[temp2].name),
-		5:"-You manage to catch {0} off guard!".format(live_enemies[temp2].name),
-		6:"-{0} lunges!".format(live_enemies[temp2].name),
+		1:"-The {0} runs at you!".format(live_enemies[temp2].name),
+		2:"-The {0} eyes you menacingly...".format(live_enemies[temp2].name),
+		3:"-You throw a mean look at the {0}.".format(live_enemies[temp2].name),
+		4:"-The {0} tries to flank you!".format(live_enemies[temp2].name),
+		5:"-You manage to catch the {0} off guard!".format(live_enemies[temp2].name),
+		6:"-The {0} lunges!".format(live_enemies[temp2].name),
 		}[temp]
 		
 def generate_random_encounter(chance_to_occur, max_challenge_rating, environment):
