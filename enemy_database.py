@@ -1,11 +1,13 @@
 from game_universal_functions import *
 
 possible_enemy_loot = {
-	"ROUS": ["","","","Wooden Shield","!2","!2"],
-	"Goblin": ["","Wooden Shield", "!4", "Iron Sword"],
-	"Kobold": ["","!4","Wooden Spear", "Sling", "3 x Pebble"],
-	"Guard": ["","!10", "Iron Sword", "10 x Iron Arrow"],
-	"Marauder": ["","!5", "Wooden Shield", "Iron Shield", "Iron Bastard Sword"]
+	"ROUS": ["","","","ROUS Fang","ROUS Tail","ROUS, Fur"],
+	"Goblin": ["","Wooden Shield", "!4", "Iron Sword", "Goblin Eye", "Leather Square"],
+	"Kobold": ["","Leather Square","!4","Wooden Spear", "Sling", "3 x Pebble", "Kobold Trinkets", "Kobold Vest"],
+	"Guard": ["","!10", "Iron Sword", "10 x Iron Arrow", "Rusty Chainmail"],
+	"Marauder": ["","!5", "Wooden Shield", "Iron Shield", "Iron Bastard Sword", "Leather Square"],
+	"Thug": ["","!5", "Leather Overcoat", "Large Wooden Shield", "Iron War Axe", "Leather Square", "Short Spear"],
+	"Lycan": ["", "", "Lycan Eye", "Lycan Claw", "!50"]
 	}
 		
 #Responsible for generation of monster stats.

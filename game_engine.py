@@ -46,7 +46,7 @@ class Control(object):
 		self.ask_question	 = False
 		self.add_item		 = False	
 	def change_to(self, plot_point):		
-		self.battle_description = "" ###DELETE?
+		self.battle_description = ""
 		
 		try:
 			#Gather the list of information related to a specific scene.
@@ -216,9 +216,10 @@ class Shop(object):
 			self.prices			=["D","D","D","D",5]
 			self.charisma_score	=15
 			self.name 			= shop_id
-		elif shop_id == "Mole Forge":###Make Awesome.
-			self.inventory		=["Steel Bastard Sword", "Rapier", "Cracked Wooden Bow", "Stone Arrow", "Red Potion"]
-			self.buy_quantities	=[1,1,1,2,1]
+		elif shop_id == "Mole Forge":
+			#Sell all items at default price
+			self.inventory		=item_details.keys()
+			self.buy_quantities	=[1 for i in range(len(self.inventory))] #All items default pricing
 			self.prices			=["D" for i in range(len(self.inventory))] #All items default pricing
 			self.charisma_score	=20
 			self.name 			= shop_id
@@ -369,10 +370,10 @@ class Arena(object):
 			self.chal_rating_max	= 5
 			self.enemy_quantity_lim = 3
 			self.name				= arena_id
-		elif arena_id == "Mole Arena of Death":
+		elif arena_id == "Mole Arena of Pain":
 			self.bet_range  		= [20,100] 
 			self.chal_rating_max	= 10
-			self.enemy_quantity_lim = 10
+			self.enemy_quantity_lim = 15
 			self.name				= arena_id
 		else:
 			raise Exception("Invalid arena_id")
@@ -384,7 +385,7 @@ class Arena(object):
 		global live_enemies
 		
 		print "__"*10
-		print "Welcome to the {}!".format(self.name)
+		print "You enter the {}!".format(self.name)
 		while arena_active:
 			while True:
 				try:
