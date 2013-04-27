@@ -855,27 +855,56 @@ def battle_turn():
 		print str(i+1) + ".) " + live_enemies[i].name + " (Health: "+str(live_enemies[i].hp)+")"
 	print "\nHealth: " + str(player.hp) + "/" + str(player.hp_max) + "\n\"Attack\" or \"inventory\"?"
 	while (True):
-		choice = raw_input("--")
-		if (choice.lower() == "attack" or choice.lower()=="a"):
+		unparsed_choice = raw_input("--")
+		unparsed_choice = unparsed_choice.split()
+		try:
+			choice = str(unparsed_choice[0]).lower()
+			assert choice in {"attack", "a", "inventory", "i", "0"}
+		except:
+			print "Invalid input: please choose \"attack\" or \"inventory\"."
+			continue
+		
+		if choice == "inventory" or choice == "i" or choice == "0":
+			player.view_inventory()
+			#Reprint enemy list.
+			print "You return to battle..."
+			for i in range(len(live_enemies)):
+				print str(i+1) + ".) " + live_enemies[i].name + " (Health: "+str(live_enemies[i].hp)+")"
+			print "\nHealth: " + str(player.hp) + "/" + str(player.hp_max) + "\n\"Attack\" or \"inventory\"?"
+			continue			
+		else: #if choice == "attack" or choice == "a":
+			#Make sure that the player is able to attack.
 			if player.active_ammo != "None":
 				try:
+					#If player needs ammo, make sure it is equipped.
 					assert(player.eq_ammo!="None")
 				except:
-					print "You must equip ammo to use your {}!".format(player.eq_weapon)
+					print "You must equip have {}s to use your {}!".format(player.active_ammo, player.eq_weapon)
 					continue
-			print "\nSelect the opponent you wish to attack."
-			#Collect player choice and verify/insanity-check.
-			while (True):
-				try:
-					choice = int(raw_input("--"))-1
-					assert (0 <= choice <= len(live_enemies))
-					break
-				except:
-					if len(live_enemies)>1:
-						print "That is not a valid response. Please choose a number between \"1\" and \"{}\".".format(str(len(live_enemies)))
-					else:
-						print "That is not a valid response. The only option is \"1\"."
-			
+					
+			#Gather and insanity-check information.
+			try:
+				#Shortcut Method ("a 2" for "attack enemy #2")
+				attack_choice = int(unparsed_choice[1])-1
+				assert 0 <= attack_choice < len(live_enemies)
+			except:
+				while (True):
+					try:
+						if len(unparsed_choice)>1:
+							print "(Invalid enemy number.)"
+							unparsed_choice = [] #Prevents repeats if user re-enters bad input.
+						
+						#Traditional Method:
+						print "\nSelect the opponent you wish to attack."
+						attack_choice = int(raw_input("--"))-1
+						assert 0 <= attack_choice < len(live_enemies)
+						break
+					except:
+						if len(live_enemies)>1:
+							print "That is not a valid response. Please choose a number between \"1\" and \"{}\".".format(str(len(live_enemies)))
+						else:
+							print "That is not a valid response. The only option is \"1\"."
+				
 			#Update fight style (and remove arrow per attack if applicable).
 			if player.active_ammo != "None": 
 				for i in player.inventory:
@@ -888,27 +917,23 @@ def battle_turn():
 					player.inventory_remove(player.eq_ammo)
 				scene.fight_style = "char_ranged"
 			else:
-				scene.fight_style = "char_melee"		
+				scene.fight_style = "char_melee"
 			
-			#Actually attack the enemy.
+			#Attack/damage the enemy.
 			attack_roll = d(20) + player.ability_modifiers[0]+player.attack_bonus
 
 			damage_to_perform = d(player.attack_damage) + player.ability_modifiers[0]
 			if (damage_to_perform<1): damage_to_perform=1
 		
-			live_enemies[choice].been_attacked(damage_to_perform, attack_roll)
+			live_enemies[attack_choice].been_attacked(damage_to_perform, attack_roll)
 			break
-		elif (choice.lower() == "inventory" or choice.lower()=="i"):
-			player.view_inventory()
-		else:
-			print "That is not a valid response. Please try again."
-		
+			
 	#Enemy turn
 	for i in range(len(live_enemies)):
 		enemy_attack_roll = d(20)
 		if (enemy_attack_roll >= player.AC):
 			enemy_damage_roll = d(live_enemies[i].damage)
-			print "-" + live_enemies[i].name + " hits you for " + str(enemy_damage_roll) + " damage!"
+			print "-The " + live_enemies[i].name + " hits you for " + str(enemy_damage_roll) + " damage!"
 			player.hp -= enemy_damage_roll
 		else:
 			print generate_fight_sequence("enemy").format(live_enemies[i].name)
@@ -923,7 +948,7 @@ def generate_fight_sequence(mode):
 		temp = d(5)
 		return {
 		1:"-You dodge {0}'s attack!",
-		2:"-{0} knicks you, but it's only a flesh wound.",
+		2:"-The {0} knicks you, but it's only a flesh wound.",
 		3:"-You jump out of the {0}'s blow!",
 		4:"-The {0} misses!",
 		5:"-The {0}'s attack falls short!",
@@ -941,7 +966,7 @@ def generate_fight_sequence(mode):
 		temp = d(6)
 		return {
 		1:"-Your attack misses!",
-		2:"-{0} dodges your attack!",
+		2:"-The {0} dodges your attack!",
 		3:"-Your shot flies over the {0}'s head!",
 		4:"-The {0} jumps out of your line of fire.",
 		5:"-The {0} side-steps and your shot misses!",
