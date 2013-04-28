@@ -40,6 +40,9 @@ def weapon(item):
 		elif item=="Rapier":
 			player.attack_bonus_weapon  = 3
 			player.attack_damage_weapon = 4
+		elif item=="Hero's Sword":
+			player.attack_bonus_weapon  = 10
+			player.attack_damage_weapon = 15
 		elif item=="Iron War Axe":
 			player.attack_bonus_weapon  = 5
 			player.attack_damage_weapon = 7
@@ -289,7 +292,8 @@ item_details = {
 	"Steel Claymore"		:[weapon,400],
 	"Iron War Axe"			:[weapon,55],
 	"Iron Battle Axe"		:[weapon,45],
-	"Mythryl Halberd"		:[weapon,4100],
+	"Mythryl Halberd"		:[weapon,4500],
+	"Hero's Sword"			:[weapon,3500],
 	"Wooden Spear"			:[weapon,3],
 	"Long Spear"			:[weapon,9],
 	"Short Spear"			:[weapon,15],
@@ -330,14 +334,20 @@ item_details = {
 	"Bolt"					:[ammo,10/3.0],		#
 	
 	"ROUS Fang"				:[junk,5],
-	"ROUS Tail"				:[junk,3],
-	"Leather Square"		:[junk,7],
-	"Lycan Claw"			:[junk,350],
-	"Goblin Eye"			:[junk,15],
 	"ROUS Fur"				:[junk,10],
+	"ROUS Tail"				:[junk,3],
+	"NOUS Tail"				:[junk,8],
+	"NOUS Scales"			:[junk,15],
+	"Leather Square"		:[junk,7],
+	"Goblin Eye"			:[junk,15],
 	"Kobold Trinkets"		:[junk,20],
 	"Kobold Vest"			:[junk,10],
+	"Lycan Claw"			:[junk,350],
 	"Lycan Eye"				:[junk,400],
+	"Spoctiderpus Beak"		:[junk,1350],
+	"Spoctiderpus Venom"	:[junk,1000],
+	"Lobster Meat"			:[junk,15],
+	"Rock Lobster Shell"	:[junk,25],
 	}
 
 #Two-hand weapons (can't double with a shield)

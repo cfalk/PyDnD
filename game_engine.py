@@ -56,7 +56,7 @@ class Control(object):
 			self.options_results = temp[2][:] 
 			self.scene 			 = temp[3]
 		except:
-			print "KEY NOT FOUND, BUT CONTINUING."###REMOVE IN FINAL
+			print "ERROR: KEY NOT FOUND, BUT CONTINUING."###Should not be necessary.
 			pass
 		
 		#Scene-specific happenstances:		
@@ -93,7 +93,7 @@ class Control(object):
 			self.description += ("\n(Listen check of: "+str(listen_check) + ")")
 		elif (plot_point==1.4):
 			#Question--Man with Red Potions
-			self.question="Accept them?"
+			self.question="Accept his potions?"
 			self.question_response_true="You pocket the potions and the old man walks back into the forest."
 			self.question_response_false="The man walks back into the forest as quietly as he came."
 			self.question_result_true="inventory_add"
@@ -170,7 +170,7 @@ class Control(object):
 				self.battle_active=True	
 		elif (plot_point==7.1):
 			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
-			item_found = choice(item_details.keys()) #Randomly chooses an item.
+			item_found = random.choice(item_details.keys()) #Randomly chooses an item.
 			if (spot_check>=15):
 				#Find a Weapon.
 				self.description += "You find a {} in one of the broken-down doors!".format(item_found)
@@ -206,7 +206,7 @@ class Control(object):
 			self.description += ("(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==17.1):
 			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
-			item_found = choice(item_details.keys()) #Randomly chooses an item.
+			item_found = random.choice(item_details.keys()) #Randomly chooses an item.
 			if (spot_check>=15):
 				#Find a Weapon.
 				self.description = "You pick up a {} that was lying on the ground!".format(item_found)
@@ -221,22 +221,50 @@ class Control(object):
 			else:
 				self.description += ("The smoldering fire is old -- but not... TOO... old.")
 			self.description += ("(Spot check of: "+str(spot_check) + ")")
+		elif (plot_point==206):
+			if plot_point in self.game_path:
+				#Generate random battle
+				generate_random_encounter(10, 1, "Field")
+				self.description += "\nYou return to where you heroically faced the Spoctiderpus. \nThe chest is still in the corner."
+			else:
+				Monster("Spoctiderpus", 15)
+				self.battle_description = generate_fight_sequence("pre_battle")
+				self.battle_active=True	
+				self.description += "\nSomehow you managed to defeat the legendary Spoctiderpus! You see a treasure chest in the corner."
+		elif (plot_point==206.1):
+			#Question -- Rusty sword on ground
+			self.question="Open the Chest?"
+			self.question_response_true="You find a heroic-looking sword! You add it to your inventory."
+			self.question_response_false="On second thought... You leave the chest alone."
+			self.question_result_true="inventory_add"
+			self.object_to_add = "Hero's Sword"
+			self.object_quantity = 1					
+			
+			if (plot_point in self.game_path):
+				if (self.game_path[self.game_path.index(plot_point)-1]=="F"):
+					self.description += ("\nThe chest is innocently sitting in the corner.")
+					self.ask_question=True
+			else:
+				self.description += ("\nYou approach the gold-trimmed chest.")
+				self.ask_question=True
+			
 		else: #GENERAL CASES:
 			if plot_point in {9, 12, 15}: generate_random_encounter(10, player.level, "Field")
+			elif plot_point in {202,203,204,205}: generate_random_encounter(30, 1, "Water_Dungeon") #Water Dungeon
 		
 		"""GENERAL TOWN OPTIONS"""
-		#Shopping Container
+		#Shopping Containers
 		if (plot_point==102): #"54,48"
 			shop.change_to("Townington Emporium")
 			shop.activate()
 		elif (plot_point==112): #"55,50"
 			shop.change_to("Mole Forge")
 			shop.activate()
-		#Arena Container
+		#Arena Containers
 		if (plot_point==103): #"54,48"
 			arena.change_to("Townington Fight Club")
 			arena.activate()
-		if (plot_point==113): #"55,50"
+		elif (plot_point==113): #"55,50"
 			arena.change_to("Mole Arena of Death")
 			arena.activate()
 				
@@ -691,8 +719,7 @@ class Character(object):
 			self.inventory[location_in_inv][1] += item_quantity
 		else:
 			#Adds item, quantity, type, and value information to inventory.
-			self.inventory +=[[item,item_quantity] + item_details[item]]
-			
+			self.inventory +=[[item,item_quantity] + item_details[item]]			
 	def inventory_remove(self,item,force_remove=False):		
 		location_in_inv = -1 #IE: Must change in order to be "found"
 		for i in range(len(self.inventory)):
@@ -765,8 +792,7 @@ class Monster(object):
 		
 		self.loot			= gen_enemy_loot(self.name)
 		global live_enemies #Adds enemy to list of living enemies
-		live_enemies		+= [self] 
-		
+		live_enemies		+= [self] 		
 	def been_attacked(self,damage,attack_roll):
 		global dead_enemies
 		global live_enemies
@@ -844,7 +870,7 @@ def collect_loot():
 			print "__"*3 + "\nSelect any loot you wish to collect (\"N\": abandon rest; \"A\": collect all)."
 			while (True):
 				if len(total_loot)==0:
-					print "\nAll loot collected!"
+					print "All loot collected!"
 					break
 				#Print the available loot each iteration.
 				print "The following loot remains: "
@@ -876,7 +902,6 @@ def collect_loot():
 						except:
 							item_to_add=temp
 							player.inventory_add(item_to_add, 1)
-					print "You collect all of the loot."
 				else:
 					temp = total_loot.pop(choice-1)
 					try:
@@ -1073,42 +1098,44 @@ def generate_random_encounter(chance_to_occur, max_challenge_rating, environment
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
 				max_enemy_level   = d(player.level)+4
 				number_of_enemies = d(1+player.level/5)
-			if max_challenge_rating >=8:
+			elif max_challenge_rating >=8:
 				possible_encounters = ["Marauder", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level)+2
 				number_of_enemies = d(2+player.level/2)		
-			if max_challenge_rating >=5:
+			elif max_challenge_rating >=5:
 				possible_encounters = ["Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level/2)+2
 				number_of_enemies = d(2+player.level/3)+d(max_challenge_rating)	
-			if max_challenge_rating < 5:	
+			else: #max_challenge_rating < 5:	
 				possible_encounters = ["ROUS", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
 				max_enemy_level   = d(player.level/4)+2
 				number_of_enemies = d(player.level/4+max_challenge_rating+1)
-		if environment=="Water":
-			pass###
-		if environment=="Cave":
-			pass###
-		if environment=="Arena":
+		elif environment=="Water_Dungeon":
+				#Could add different challenge_ratings, but not necessary.
+				possible_encounters = ["NOUS", "Rock Lobster"]
+				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
+				max_enemy_level   = d(player.level/3)+2
+				number_of_enemies = d(player.level/3+1)
+		elif environment=="Arena":
 			if max_challenge_rating == 10:
 				possible_encounters = ["Marauder", "Goblin", "Lycan"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
 				max_enemy_level   = d(player.level)+4
 				number_of_enemies = d(1+player.level/5)
-			if max_challenge_rating >=8:
+			elif max_challenge_rating >=8:
 				possible_encounters = ["Marauder", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level)+2
 				number_of_enemies = d(2+player.level/2)		
-			if max_challenge_rating >=5:
+			elif max_challenge_rating >=5:
 				possible_encounters = ["Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level/2)+2
 				number_of_enemies = d(2+player.level/3)+d(max_challenge_rating)	
-			if max_challenge_rating < 5:	
+			else: #max_challenge_rating < 5:	
 				possible_encounters = ["ROUS", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
 				max_enemy_level   = d(player.level/4)+2
@@ -1130,3 +1157,5 @@ arena = Arena()
 from item_database import *
 
 ###DEVELOPMENT MODIFICATIONS
+for i in range(19):
+	player.level_up()
