@@ -33,7 +33,7 @@ def gen_enemy_stats(enemy, enemy_level):
 			"Spoctiderpus":			[enemy, 200, 10, 15, enemy_level],
 			}[enemy]
 	except:
-		print "\"" + str(enemy) + "\" is not a stock enemy."
+		print "ERROR: \"" + str(enemy) + "\" is not a stock enemy."
 
 #Responsible for generation of enemy loot.
 def gen_enemy_loot(enemy):
@@ -41,4 +41,4 @@ def gen_enemy_loot(enemy):
 		temp = d(len(possible_enemy_loot[enemy])-1)
 		return possible_enemy_loot[enemy][temp]
 	except:
-		print "\"" + str(enemy) + "\" is not a stock enemy."
+		print "ERROR: \"" + str(enemy) + "\" is not a stock enemy."

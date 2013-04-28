@@ -2,7 +2,7 @@ from game_universal_functions import *
 from game_engine import player #Allow the 'player' to be directly modified.
 
 #TYPE FUNCTIONS:
-#	Responsible for stat changes.
+#	(Responsible for stat/character changes.)
 
 def weapon(item):	
 	player.active_ammo  = "None"
@@ -19,7 +19,7 @@ def weapon(item):
 		player.attack_damage_ammo 	= 0
 		print "You unequipped the {}.".format(item)
 	elif (player.hand_2=="Busy" and (item in weapons_2h)):
-		print "You need another hand free to equip your {}!".format(item)
+		print "ERROR: You need another hand free to equip your {}!".format(item)
 	else:
 		player.eq_weapon=item
 		player.hand_1 = "Busy"
@@ -167,7 +167,7 @@ def ammo(item):
 				player.eq_ammo=item
 				print "You equipped the {}.".format(item)
 			else:
-				print "You cannot use the {0} with your {1}!".format(item,player.eq_weapon)
+				print "ERROR: You cannot use the {0} with your {1}!".format(item,player.eq_weapon)
 		if "Sling" in player.eq_weapon:
 			if item=="Pebble":
 				player.attack_bonus_ammo  = -2
@@ -175,7 +175,7 @@ def ammo(item):
 				player.eq_ammo=item
 				print "You equipped the {}.".format(item)
 			else:
-				print "You cannot use the {0} with your {1}!".format(item,player.eq_weapon)			
+				print "ERROR: You cannot use the {0} with your {1}!".format(item,player.eq_weapon)			
 		if "Crossbow" in player.eq_weapon:
 			if item=="Bolt":
 				player.attack_bonus_ammo  = 2
@@ -183,7 +183,7 @@ def ammo(item):
 				player.eq_ammo=item
 				print "You equipped the {}.".format(item)
 			else:
-				print "You cannot use the {0} with your {1}!".format(item,player.eq_weapon)			
+				print "ERROR: You cannot use the {0} with your {1}!".format(item,player.eq_weapon)			
 		if "Blunderbuss" in player.eq_weapon:
 			if item=="Pebble":
 				player.attack_bonus_ammo  = -5
@@ -191,7 +191,7 @@ def ammo(item):
 				player.eq_ammo=item
 				print "You equipped the {}.".format(item)
 			else:
-				print "You cannot use the {0} with your {1}!".format(item,player.eq_weapon)			
+				print "ERROR: You cannot use the {0} with your {1}!".format(item,player.eq_weapon)			
 			
 def shield(item): #Only incorporates player.hand_2
 	if player.eq_shield==item:
@@ -213,7 +213,7 @@ def shield(item): #Only incorporates player.hand_2
 				player.AC_shield_bonus = 5
 			print "You equipped the " + item + "."
 		else:
-			print "You need another hand free to equip your {}!".format(item)
+			print "ERROR: You need another hand free to equip your {}!".format(item)
 	
 def armor(item):
 	if player.eq_armor==item:
@@ -348,6 +348,9 @@ item_details = {
 	"Spoctiderpus Venom"	:[junk,1000],
 	"Lobster Meat"			:[junk,15],
 	"Rock Lobster Shell"	:[junk,25],
+	"Diamond"				:[junk,500],
+	"Dwarven Ale"			:[junk,6],
+	"Troll Grog"			:[junk,3],
 	}
 
 #Two-hand weapons (can't double with a shield)

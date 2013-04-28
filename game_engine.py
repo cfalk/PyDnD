@@ -5,10 +5,6 @@ from enemy_database import *
 from game_database_cluster import *
 
 #CORE FUNCTIONS
-def experience_per_level(level):
-	if level==0: return 1 #Prevents pre-mature level-up in character construction.
-	else: return 10*level+5*(level-1)
-
 def binary_question(question): #Allows simpler binary choice questions.
 	print question
 	while (True):
@@ -17,7 +13,7 @@ def binary_question(question): #Allows simpler binary choice questions.
 			return True
 		if choice.lower() in valid_negative_responses:
 			return False
-		print "That is not a valid response. Try again:"
+		print "ERROR: Please use only \"yes\" or \"no\" answers."
 
 def question_consequent(question_result):
 	if question_result == "inventory_add":
@@ -28,13 +24,13 @@ race_options = ["Elf", "Orc", "Human", "Dwarf", "Gnome", "Bear", "Goblin"]
 class_options = ["Fighter", "Ranger", "Wizard", "Rogue", "Bard", "Barbarian"]
 stat_names = ["Strength", "Dexterity","Constitution", "Wisdom", "Intelligence", "Charisma"]
 	
-valid_positive_responses={"yes", "yup", "y", "yeah", "sure", "alright"} #To remain constant
+valid_positive_responses={"yes", "yup", "yep", "y", "yeah", "sure", "alright"} #To remain constant
 valid_negative_responses={"no", "nope", "n", "nah", "never"} #To remain constant
 
 live_enemies 			= []
 dead_enemies 			= []
 
-#Game Mechanics
+#GAME MECHANICS
 class Control(object):
 	def __init__(self):
 		self.options	 	 = []
@@ -68,11 +64,11 @@ class Control(object):
 		elif (plot_point==1.1):
 			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
 			if (spot_check>=8):
-				self.description += ("You notice your bag is still attached to your belt!\n")
+				self.description += ("You notice your bag is still attached to your belt!")
 			if (spot_check>=12):
-				self.description += "You believe you saw something move amidst the shadows of some trees.\n"
+				self.description += "You believe you saw something move amidst the shadows of some trees."
 				self.options +=["Call Out"]
-			self.description += ("(Spot check of: "+str(spot_check) + ")")
+			self.description += ("\n(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==1.2):
 			if "Cardinal Directions" in player.knowledge:
 				self.options += ["Wander West", "Wander East"]
@@ -184,17 +180,25 @@ class Control(object):
 				self.description += ("The Marauders appeared to be hiding in one of the huts. \"Threat\" terminated.")
 			else:
 				self.description += ("You find nothing in the camp. It seems it has already been plundered...")
-			self.description += ("(Spot check of: "+str(spot_check) + ")")
+			self.description += ("\n(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==8):
 			player.knowledge = player.knowledge.union({"Cardinal Directions"})
-		elif (plot_point==11.1):
+		elif (plot_point==11.1):###
 			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
 			if (spot_check>=8):
-				self.description += ("You notice your bag is still attached to your belt!\n")
+				self.description += ("You notice your bag is still attached to your belt!")
 			if (spot_check>=12):
-				self.description += "You believe you saw something move amidst the shadows of some trees.\n"
+				self.description += "You believe you saw something move amidst the shadows of some trees."
 				self.options +=["Call Out"]
-			self.description += ("(Spot check of: "+str(spot_check) + ")")
+			self.description += ("\n(Spot check of: "+str(spot_check) + ")")
+		elif (plot_point==15.1):
+			int_check = d(20)+player.ability_modifiers[4]#Wisdom
+			if (int_check>=25):
+				self.description = ("A fist-sized diamond falls out of the sky and into your inventory (Seriously?).")
+				player.inventory_add("Diamond", 1)
+			else:
+				self.description = "You meditate for a while, but nothing happens."
+			self.description += ("\n(Intelligence check of: "+str(int_check) + ")")
 		elif (plot_point==16.1):
 			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
 			if (spot_check>=14):
@@ -203,7 +207,7 @@ class Control(object):
 			else:
 				self.description = "Too bad. Just a boring, old rock that probably isn't hiding anything."
 				self.options += ["Turn Around."]
-			self.description += ("(Spot check of: "+str(spot_check) + ")")
+			self.description += ("\n(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==17.1):
 			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
 			item_found = random.choice(item_details.keys()) #Randomly chooses an item.
@@ -221,6 +225,20 @@ class Control(object):
 			else:
 				self.description += ("The smoldering fire is old -- but not... TOO... old.")
 			self.description += ("(Spot check of: "+str(spot_check) + ")")
+		elif (plot_point==18.2):
+			if not plot_point in self.game_path:
+				player.inventory_add("Dwarven Ale", d(5))
+				player.inventory_add("Troll Grog", d(4))
+				self.description = "Surprisingly, all you can find is Dwarven Ale and Troll Grog. You help yourself."
+			else:
+				self.description = "The tower is still empty from your last pillaging."
+		elif (plot_point==18.4):
+			if not plot_point in self.game_path:
+				for i in range(d(2)+3):
+					Monster("Guard", 6)
+				self.battle_description = generate_fight_sequence("pre_battle")
+				self.battle_active=True	
+				self.description += "\nYou have successfully become a criminal. Way to go."
 		elif (plot_point==206):
 			if plot_point in self.game_path:
 				#Generate random battle
@@ -548,7 +566,7 @@ class Arena(object):
 				dead_enemies = []
 			arena_active=False
 				
-#Character and Monster Generators:
+#CHARACTER and MONSTER GENERATORS/CONTROLLERS:
 class Character(object):
 	def __init__(self):
 		#Create Character
@@ -566,7 +584,7 @@ class Character(object):
 					self.race = race_options[temp-1]
 					break
 				except:
-					print "That is not a valid race option. Please select a number from 1 to " +str(len(race_options))+ ".\n"
+					print "ERROR: Please select a number from 1 to " +str(len(race_options))+ ".\n"
 					
 			print "Please choose a class to play by selecting a number:"
 			for i in range (len(class_options)):
@@ -578,7 +596,7 @@ class Character(object):
 					self.cclass = class_options[temp-1]
 					break
 				except:
-					print "That is not a valid class option. Please select a number from 1 to " +str(len(class_options))+ ".\n"
+					print "ERROR: Please select a number from 1 to " +str(len(class_options))+ ".\n"
 			print "__"*20			
 			self.erase() #Sets up/Resets character's stats. 
 			print "Your randomly generated stats are as follows:"
@@ -593,20 +611,11 @@ class Character(object):
 			self.level_up() #Forces level-up from 0 to 1.
 			print "__"*10
 			
-			while (True):
-				temp = raw_input("Is the character, " + self.name + " the " + self.race + " " + self.cclass + ", to your liking?\n--").lower()
-				if (temp in valid_positive_responses):
-					player_choice="yes"
-					break
-				elif (temp in valid_negative_responses):
-					player_choice="no"
-					break
-				else:
-					print "Please input either \"yes\" or \"no\".\n"
-			if player_choice=="yes":
+			question = "Is the character, {} the {}, to your liking?".format(self.name, self.race, self.cclass)
+			if binary_question(question):
 				break
 			else:
-				print "__"*30	
+				print "RESTARTING CHARACTER CONSTRUCTION...\n"+"__"*30	
 		#Inventory
 		self.gold = 0
 		self.inventory = [] #Contains list, [item,quant,value], for each item.
@@ -646,30 +655,30 @@ class Character(object):
 	def level_up(self):
 		if self.level==0:
 			self.hit_die 	= class_modifications(self.cclass)
-			self.hp_max = self.hit_die+self.ability_modifiers[2]
-			self.hp 	= self.hp_max
+			self.hp_max 	= self.hit_die+self.ability_modifiers[2]
+			self.hp 		= self.hp_max
 			self.level 		= 1
 		else:
 			temp			 = [d(self.hit_die), d(self.hit_die)]
-			self.hp		+= max(temp)+self.ability_modifiers[2]
-			self.hp_max	+= max(temp)+self.ability_modifiers[2]
+			self.hp			+= max(temp)+self.ability_modifiers[2]
+			self.hp_max		+= max(temp)+self.ability_modifiers[2]
 			self.level		+= 1
-			print "You are now level " + str(self.level) + "!"
+			print "__"*4 + "\nLEVEL UP!"
 		#Below: Ability increase every four levels.
 		if (self.level%4==0):
-			print ""
+			print "\nCurrent Abilities:"
 			for i in range(len(self.ability_modifiers)):
 				print str(i+1) + ".) " + stat_names[i] + ": " + str(self.stats[i])
-			print "\nPlease select an ability to increase by one."
+			print "\nPlease select an ability to increase by one:"
 			while (True):
 				try:
-					temp = int(raw_input("--"))
-					assert(temp>0)
-					self.stats[temp-1] = self.stats[temp-1]+1
-					self.ability_modifiers[temp-1] = (self.stats[temp-1]-10)/2
+					choice = int(raw_input("--"))-1
+					assert(choice>=0)
+					self.stats[choice] = self.stats[choice]+1
+					self.ability_modifiers[choice] = (self.stats[choice]-10)/2
 					break
 				except:
-					print "That is not a valid option. Please select a number from 1 to " +str(len(self.stats))+ ".\n"
+					print "ERROR: Please choose a number from 1 to " +str(len(self.stats))+ ".\n"
 		print "Character Level: " + str(self.level)
 		print "Hitpoints: " + str(self.hp) + "/" + str(self.hp_max)
 	def view_inventory(self):
@@ -808,7 +817,7 @@ class Monster(object):
 			print generate_fight_sequence("enemy_dead").format(self.name)
 			live_enemies.remove(self)
 
-#Gameplay Functions:
+#GAMEPLAY FUNCTIONS:
 def pop_experience(enemy):
 	effective_intelligence_bonus = enemy.hp_max+player.ability_modifiers[4]
 	experience_earned = (enemy.level * effective_intelligence_bonus)/player.level
@@ -1011,19 +1020,23 @@ def battle_turn():
 			break
 			
 	#Enemy turn
-	for i in range(len(live_enemies)):
+	for i in live_enemies:
 		enemy_attack_roll = d(20)
 		if (enemy_attack_roll >= player.AC):
-			enemy_damage_roll = d(live_enemies[i].damage)
-			print "-The " + live_enemies[i].name + " hits you for " + str(enemy_damage_roll) + " damage!"
+			enemy_damage_roll = d(i.damage)
+			print "-The " + i.name + " hits you for " + str(enemy_damage_roll) + " damage!"
 			player.hp -= enemy_damage_roll
 		else:
-			print generate_fight_sequence("enemy").format(live_enemies[i].name)
+			print generate_fight_sequence("enemy").format(i.name)
 
 	#Prepare for next round
 	if (len(live_enemies)>0 and player.hp>0):
 		battle_description = generate_fight_sequence("mid_battle")
-	
+
+def experience_per_level(level):
+	if level==0: return 1 #Prevents pre-mature level-up in character construction.
+	else: return 10*level+5*(level-1)
+
 def generate_fight_sequence(mode):
 	global live_enemies
 	if (mode == "enemy"):
@@ -1072,22 +1085,22 @@ def generate_fight_sequence(mode):
 			}[temp]
 		if (len(live_enemies)>1):
 			temp = d(3)
-			temp2 = d(len(live_enemies)-1)-1
+			temp2 = random.choice(live_enemies) #Functionally, the same thing as above since only homogeneous groups are created.
 			return {
-			1:"-You encounter some {0}s!".format(live_enemies[temp2].name),
-			2:"-{0}s surround you!".format(live_enemies[temp2].name),
-			3:"-{0}s ambush you!".format(live_enemies[temp2].name),
+			1:"-You encounter some {0}s!".format(temp2.name),
+			2:"-{0}s surround you!".format(temp2.name),
+			3:"-{0}s ambush you!".format(temp2.name),
 			}[temp]			
 	if (mode == "mid_battle"):
 		temp = d(6)
-		temp2 = d(len(live_enemies)-1)-1
+		temp2 = random.choice(live_enemies)
 		return {
-		1:"-The {0} runs at you!".format(live_enemies[temp2].name),
-		2:"-The {0} eyes you menacingly...".format(live_enemies[temp2].name),
-		3:"-You throw a mean look at the {0}.".format(live_enemies[temp2].name),
-		4:"-The {0} tries to flank you!".format(live_enemies[temp2].name),
-		5:"-You manage to catch the {0} off guard!".format(live_enemies[temp2].name),
-		6:"-The {0} lunges!".format(live_enemies[temp2].name),
+		1:"-The {0} runs at you!".format(temp2.name),
+		2:"-The {0} eyes you menacingly...".format(temp2.name),
+		3:"-You throw a mean look at the {0}.".format(temp2.name),
+		4:"-The {0} tries to flank you!".format(temp2.name),
+		5:"-You manage to catch the {0} off guard!".format(temp2.name),
+		6:"-The {0} lunges!".format(temp2.name),
 		}[temp]
 		
 def generate_random_encounter(chance_to_occur, max_challenge_rating, environment):
@@ -1106,39 +1119,39 @@ def generate_random_encounter(chance_to_occur, max_challenge_rating, environment
 			elif max_challenge_rating >=5:
 				possible_encounters = ["Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
-				max_enemy_level   = d(player.level/2)+2
-				number_of_enemies = d(2+player.level/3)+d(max_challenge_rating)	
+				max_enemy_level   = d(player.level/2+1)+2
+				number_of_enemies = d(player.level/3+2)+d(max_challenge_rating)	
 			else: #max_challenge_rating < 5:	
 				possible_encounters = ["ROUS", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
-				max_enemy_level   = d(player.level/4)+2
-				number_of_enemies = d(player.level/4+max_challenge_rating+1)
+				max_enemy_level   = d(player.level/4+1)+2
+				number_of_enemies = d(player.level/4+2)
 		elif environment=="Water_Dungeon":
 				#Could add different challenge_ratings, but not necessary.
 				possible_encounters = ["NOUS", "Rock Lobster"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
-				max_enemy_level   = d(player.level/3)+2
+				max_enemy_level   = d(player.level/3+1)+2
 				number_of_enemies = d(player.level/3+1)
 		elif environment=="Arena":
 			if max_challenge_rating == 10:
 				possible_encounters = ["Marauder", "Goblin", "Lycan"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
 				max_enemy_level   = d(player.level)+4
-				number_of_enemies = d(1+player.level/5)
+				number_of_enemies = d(player.level/5+1)
 			elif max_challenge_rating >=8:
 				possible_encounters = ["Marauder", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level)+2
-				number_of_enemies = d(2+player.level/2)		
+				number_of_enemies = d(player.level/2+2)		
 			elif max_challenge_rating >=5:
 				possible_encounters = ["Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level/2)+2
-				number_of_enemies = d(2+player.level/3)+d(max_challenge_rating)	
+				number_of_enemies = d(player.level/3+2)+d(max_challenge_rating)	
 			else: #max_challenge_rating < 5:	
 				possible_encounters = ["ROUS", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
-				max_enemy_level   = d(player.level/4)+2
+				max_enemy_level   = d(player.level/4+1)+2
 				number_of_enemies = d(player.level/4+max_challenge_rating+1)
 		while number_of_enemies > 0:
 			Monster(specific_enemy, max_enemy_level)
@@ -1147,7 +1160,7 @@ def generate_random_encounter(chance_to_occur, max_challenge_rating, environment
 		scene.battle_active = True
 		scene.battle_description += generate_fight_sequence("pre_battle")
 
-#Object Initiation
+#OBJECT INITIATION:
 player = Character()
 scene = Control()
 shop = Shop()
@@ -1156,6 +1169,17 @@ arena = Arena()
 #IMPORT CLASS-DEPENDENT DATABASES:
 from item_database import *
 
-###DEVELOPMENT MODIFICATIONS
-for i in range(19):
-	player.level_up()
+#DEVELOPMENT MODIFICATIONS:
+#Choose Starting Level:
+print "What level would you like to start at?"
+while (True):
+	try:
+		level_choice = int(raw_input("--"))
+		assert (25>=level_choice>0)
+		while (level_choice-1)>0:
+			player.level_up()
+			level_choice -= 1
+		break
+	except:
+		print "ERROR: Please choose a number between 1 and 25."
+	
