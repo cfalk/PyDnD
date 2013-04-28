@@ -118,7 +118,7 @@ class Control(object):
 			if plot_point in self.game_path:
 				#Generate random battle
 				generate_random_encounter(10, 1, "Field")
-				self.description = "You return to where you were ambushed by goblins. The trees creek in the dim light of the forest."
+				self.description = "You return to where you were ambushed by ROUSs. The trees creek in the dim light of the forest."
 			else:
 				#Generate scripted battle.
 				for i in range(d(3)):
@@ -169,8 +169,22 @@ class Control(object):
 				self.battle_description = generate_fight_sequence("pre_battle")
 				self.battle_active=True	
 		elif (plot_point==7.1):
-			###LOOT TEH CAMP
-			pass
+			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
+			item_found = choice(item_details.keys()) #Randomly chooses an item.
+			if (spot_check>=15):
+				#Find a Weapon.
+				self.description += "You find a {} in one of the broken-down doors!".format(item_found)
+				player.inventory_add(item_found)
+			elif (15>spot_check>=10):
+				#Surprise Battle.
+				for i in range(d(2)+1):
+					Monster("Marauder", 2)
+				self.battle_description = generate_fight_sequence("pre_battle")
+				self.battle_active=True					
+				self.description += ("The Marauders appeared to be hiding in one of the huts. \"Threat\" terminated.")
+			else:
+				self.description += ("You find nothing in the camp. It seems it has already been plundered...")
+			self.description += ("(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==8):
 			player.knowledge = player.knowledge.union({"Cardinal Directions"})
 		elif (plot_point==11.1):
@@ -181,7 +195,35 @@ class Control(object):
 				self.description += "You believe you saw something move amidst the shadows of some trees.\n"
 				self.options +=["Call Out"]
 			self.description += ("(Spot check of: "+str(spot_check) + ")")
-
+		elif (plot_point==16.1):
+			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
+			if (spot_check>=14):
+				self.description = ("You find a hole that you could squeeze into...")
+				self.options += ["Seriously? Nope. Turn Around.", "Squeeze in..."]
+			else:
+				self.description = "Too bad. Just a boring, old rock that probably isn't hiding anything."
+				self.options += ["Turn Around."]
+			self.description += ("(Spot check of: "+str(spot_check) + ")")
+		elif (plot_point==17.1):
+			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
+			item_found = choice(item_details.keys()) #Randomly chooses an item.
+			if (spot_check>=15):
+				#Find a Weapon.
+				self.description = "You pick up a {} that was lying on the ground!".format(item_found)
+				player.inventory_add(item_found)
+			elif (15>spot_check>=10):
+				#Surprise Battle.
+				for i in range(d(2)+2):
+					Monster("Thug", 4)
+				self.battle_description = generate_fight_sequence("pre_battle")
+				self.battle_active=True					
+				self.description = ("The thugs that ambushed you are no longer able to ambush you.")
+			else:
+				self.description += ("The smoldering fire is old -- but not... TOO... old.")
+			self.description += ("(Spot check of: "+str(spot_check) + ")")
+		else: #GENERAL CASES:
+			if plot_point in {9, 12, 15}: generate_random_encounter(10, player.level, "Field")
+		
 		"""GENERAL TOWN OPTIONS"""
 		#Shopping Container
 		if (plot_point==102): #"54,48"
@@ -797,42 +839,56 @@ def collect_loot():
 				i+=1
 			except:
 				i+=1
-		"""Item loot translation"""
+		#Item translation and collection process
 		if len(total_loot)>0:
-			print "__"*3 + "\nSelect any loot you wish to collect. Type \"0\" to abandon the remaining loot."
+			print "__"*3 + "\nSelect any loot you wish to collect (\"N\": abandon rest; \"A\": collect all)."
 			while (True):
-				try: 
-					if len(total_loot)==0:
-						print "\nAll loot collected!"
-						break
-					#Print the available loot each iteration.
-					print "The following loot remains: "
-					for i in range(len(total_loot)):
-						print "     " + str(i+1) + ".) " + total_loot[i]
-						
-					choice = int(raw_input("--"))
-					assert(choice>=0)
-					if choice==0:
-						print "You leave the remaining loot."
-						break
+				if len(total_loot)==0:
+					print "\nAll loot collected!"
+					break
+				#Print the available loot each iteration.
+				print "The following loot remains: "
+				for i in range(len(total_loot)):
+					print "     " + str(i+1) + ".) " + total_loot[i]
+				
+				#Collect/test input
+				choice = raw_input("--").lower()
+				if choice in {str(i+1) for i in range(len(total_loot))}:
+					choice = int(choice)
+				elif not choice in {"a","n"}:
+					if len(total_loot)==1:
+						print "That is not a valid value. The only option is \"1\"."
 					else:
-						temp = total_loot[choice-1]
+						print "That is not a valid value. Please choose a number between 1 and {}.".format(len(total_loot))				
+					continue
+						
+				#Collect loot
+				if choice=="n":
+					print "You leave the remaining loot."
+					break
+				elif choice=="a":
+					while len(total_loot)>0:
+						temp = total_loot.pop() #Repeatedly collect the last item.
 						try:
 							item_to_add = temp[temp.index(" x ")+3:]
 							quantity_to_add = int(temp[:temp.index(" x ")])
 							player.inventory_add(item_to_add, quantity_to_add)
-							print "You add the " + str(quantity_to_add) + " " + item_to_add + "s to your inventory."
-							del total_loot[choice-1]							
 						except:
 							item_to_add=temp
-							player.inventory_add(item_to_add,1)
-							print "You add the " + item_to_add + " to your inventory."
-							del total_loot[choice-1]
-				except:
-					if len(total_loot)==1:
-						print "That is not a valid value. The only option is \"1\"."
-					else:
-						print "That is not a valid value. Please choose a number between 1 and " + str(len(total_loot)) +"."
+							player.inventory_add(item_to_add, 1)
+					print "You collect all of the loot."
+				else:
+					temp = total_loot.pop(choice-1)
+					try:
+						item_to_add = temp[temp.index(" x ")+3:]
+						quantity_to_add = int(temp[:temp.index(" x ")])
+						player.inventory_add(item_to_add, quantity_to_add)
+						print "You add the " + str(quantity_to_add) + " " + item_to_add + "s to your inventory."
+					except:
+						item_to_add=temp
+						player.inventory_add(item_to_add, 1)
+						print "You add the " + item_to_add + " to your inventory."
+
 		print ""#Empty Line
 		if (looted_gold>0):
 			print "You add " + str(looted_gold) + " gold to your inventory!"

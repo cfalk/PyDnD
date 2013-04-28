@@ -11,22 +11,22 @@ scene_database = {
 		"Wherever you turn, the cackling of archaic voices seems to grow louder.\n"+
 		"You cannot tell where you are and you cannot remember what brought you here.\n"+
 		"\n[Menu Commands: Inventory(0) and Character Status(9)]\n",
-		["Spot", "Sleep", "Listen"], [1.1, 1.1, 1.2, 1.3], "50,50_start"],
+		["Spot", "Sleep", "Listen"], [1.1, 1.2, 1.3], "50,50_start"],
 	1  :["You return to where you first woke up. Nothing yet seems familiar to you.",
 		["Spot","Listen"], [1.1, 1.3, 3, 2], "50,50"],
-	1.1:["You see sunlight perforating through the leaves above; dawn is approaching.\n",
+	1.1:["You see sunlight perforating the canopy above; dawn is approaching you guess.\n",
 		["Check Again","Listen", "Wander"], [1.1,1.3,2,1.4], "50,50_searched"],
 	1.2:["You wake up with a throbbing headache."+
 		"The trees appear to be slightly greener and the noises have ceased."+
 		"You feel entirely alone.",
 		["Spot"], [1.1,3,2], "50,50_slept"],
-	1.3:["You hear the howling of jungle animals and the rippling sound of water. You feel truly alone.",
+	1.3:["You hear the howling of wild animals and the rippling sound of water. It is chilly out.",
 		["Spot","Check Again",], [1.1,1.3,2,3], "50,50_listened"],
 	1.4:["N/A",
 		["Sleep","Listen", "Wander"], [1.1,1.3,2], "50,50_called_out"],
 	2  :["The rodents are kaput.",
 		["Spot"], [1,1.1,4], "51_50"],
-	2.1:["You see nothing of interest here -- except the defeated rodents of unusual size.",
+	2.1:["You see nothing of interest here -- except the defeated Rodents of Unusual Size.",
 		["Spot"], [1,1.1,4], "51,50_searched"],
 	3  :["You have reached a dead end; the clearings become too dense to travel through.",
 		["Spot","Turn Around"], [3.1,1], "49,50"],
@@ -42,7 +42,7 @@ scene_database = {
 		["Explore the Obvious Waterfall Dungeon", "Turn Around"], [201,5], "51,49"],
 	7  :["There are a few wooden huts scattered around, but the camp looks empty.",
 		["Search for Loot", "Leave the Camp"], [7.1, 5], "53,49"],
-	7.1:["The camp is silent -- spare the sound of the crackling fire.",###LOOT TEH CAMP
+	7.1:["The camp is silent -- spare the sound of the crackling fire.",
 		["Leave the Camp"], [5], "53,49_looted"],
 	8  :["You come across a sign: \"TOWNINGTON (EAST), BANDITS (NORTH)\".",
 		["Go North", "Go East"], [4, 9], "52,51"],
@@ -62,13 +62,15 @@ scene_database = {
 		["Go North", "Go West", "Try to Materialize a Diamond"], [16, 11, 15.1], "52,55"],
 	16  :["Surprisingly, you find nothing interesting here, just some generic pine trees -- wait... nope. Boring.",
 		["Go South", "Investigate an obnoxious-looking rock."], [15, 16.1], "51,55"],
-	16.1:["You find a cave that you could squeeze into...",###SPOT CHECK?
-		["Seriously? Nope. Turn Around.", "Squeeze in..."], [16, 111], "51,55,searched"],
-	17  :["The silence of the camp seems supernatural. *crash of thunder*", ###BANDIT CAMP (DUNGEON)
-		["Explore the Camp", "Leave the Camp.", "Loot the Camp."], [17.1, 17.2, 17.3], "54,49"],
+	16.1:["N/A",
+		[], [16, 111], "51,55,searched"],
+	17  :["The silence of the camp seems supernatural. *crash of thunder*", 
+		["Explore/loot the Camp", "Leave the Camp."], [17.1, 10], "54,49"],
+	17.1:["N/A",
+		["Leave the Camp"], [10], "53,49_looted"],
 	101 :["You enter the glorious public district of Townington!",
 		["Find the Arena", "Find a Shop","Leave the Public District"], [103, 102, 14], "54,48"],
-	111 :["You enter the hidden underground city of the mole-people.",###SHOP/ARENA
+	111 :["You enter the hidden underground city of the mole-people.",
 		["Find an Arena", "Find a Shop","Return to the Surface."], [113, 112, 16], "50,55"],
 }
 	
