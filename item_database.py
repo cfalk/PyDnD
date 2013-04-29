@@ -282,7 +282,7 @@ def junk(item):
 #"ITEM" :[type, value] 
 item_details = {
 	"Rusty Iron Sword"		:[weapon,5],
-	"Iron Sword"			:[weapon,50],
+	"Iron Sword"			:[weapon,25],
 	"Iron Dagger"			:[weapon,5],
 	"Silver Dagger"			:[weapon,350],
 	"Rapier"				:[weapon,20],

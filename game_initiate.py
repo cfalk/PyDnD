@@ -1,3 +1,5 @@
+#TO PLAY THE GAME, RUN THIS FILE.
+
 from game_engine import *
 
 #Game Initiation

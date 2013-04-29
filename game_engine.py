@@ -52,7 +52,7 @@ class Control(object):
 			self.options_results = temp[2][:] 
 			self.scene 			 = temp[3]
 		except:
-			print "ERROR: KEY NOT FOUND, BUT CONTINUING."###Should not be necessary.
+			print "ERROR: KEY NOT FOUND, BUT CONTINUING."#Should never be reached in successful map build.
 			pass
 		
 		#Scene-specific happenstances:		
@@ -83,7 +83,7 @@ class Control(object):
 				self.description += ("There are lovely flowers growing here. They smell like fall.")
 			elif (listen_check >=15) and (7 in self.game_path)==False:
 				self.options += ["Wander Right", "Wander Left"]
-				self.description += "\nYou believe you heard a goblinoid squeal a distance to your right."
+				self.description += "\nYou believe you heard a rodent's squeal a distance to your right."
 			else:
 				self.options += ["Wander"]
 			self.description += ("\n(Listen check of: "+str(listen_check) + ")")
@@ -183,14 +183,6 @@ class Control(object):
 			self.description += ("\n(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==8):
 			player.knowledge = player.knowledge.union({"Cardinal Directions"})
-		elif (plot_point==11.1):###
-			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
-			if (spot_check>=8):
-				self.description += ("You notice your bag is still attached to your belt!")
-			if (spot_check>=12):
-				self.description += "You believe you saw something move amidst the shadows of some trees."
-				self.options +=["Call Out"]
-			self.description += ("\n(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==15.1):
 			int_check = d(20)+player.ability_modifiers[4]#Wisdom
 			if (int_check>=25):
@@ -312,7 +304,7 @@ class Shop(object):
 			self.charisma_score	=20
 			self.name 			= shop_id
 		else:
-			raise Exception("Invalid shop_id")
+			raise Exception("ERROR: Invalid shop_id")
 			
 	def activate(self):		
 		#Below: Import "default" price listings where requested (by presence of "D" in self.prices).
@@ -325,7 +317,7 @@ class Shop(object):
 		
 		active=True
 		print "__"*10
-		print "Welcome to {}! Enter \"0\" to exit at any time.".format(self.name)
+		print "Welcome to the {}! Enter \"0\" to exit at any time.".format(self.name)
 		while active:
 			choice = raw_input("Would you like to \"buy\" or \"sell\"?\n--")
 			if choice == "0":
@@ -346,7 +338,7 @@ class Shop(object):
 							assert(len(self.inventory) > choice >= -1)
 							break		
 						except:
-							print "That is not a valid response."
+							print "ERROR: That is not a valid response."
 					if choice == -1: #IE: Choice "0" (aka "exit the shop")
 						break
 					else:
@@ -360,7 +352,7 @@ class Shop(object):
 								quantity_to_buy = quantity_to_buy*self.buy_quantities[choice] #For items that come in pairs, triplets, etc.
 								break
 							except:
-								print "That is not a valid response."
+								print "ERROR: That is not a valid response."
 						if quantity_to_buy == 0:
 							print "You do not complete the purchase."
 						elif (purchase_total<=player.gold):
@@ -385,21 +377,21 @@ class Shop(object):
 						for i in range(len(player.inventory)):
 							item = player.inventory[i][0]
 							if player.inventory[i][1]==1:
-								print "     "+str(i+1) + ".) " + item + " -- Offer: " + str(int(round(player.inventory[i][3]*effective_sell_percentage)))
+								print "     {}.) {} -- Offer:{}".format(i+1, item, int(round(player.inventory[i][3]*effective_sell_percentage)))
 							else:
-								print "     "+(str(i+1) + ".) " + item + " -- Offer: " + str(int(round(player.inventory[i][3]*effective_sell_percentage))) +
-									" (" + str(player.inventory[i][1]) + " in inventory)")
+								print ("     {}.) {} -- Offer:{}".format(i+1, item, int(round(player.inventory[i][3]*effective_sell_percentage))) +
+									" ({} in inventory)".format(player.inventory[i][1]))
 						while (True):
 							try:
 								choice = int(raw_input("--"))-1
 								assert(len(player.inventory) > choice >= -1)
 								break
 							except:
-								print "That is not a valid response."
+								print "ERROR: That is not a valid response."
 						if choice == -1: break
 						else:
 							item_to_sell 	= player.inventory[choice][0]
-							sell_price		= int(round(player.inventory[i][3]*effective_sell_percentage))
+							sell_price		= int(round(player.inventory[choice][3]*effective_sell_percentage))
 							quantity_sold = 0
 							while (True):
 								try:
@@ -409,8 +401,7 @@ class Shop(object):
 									assert(player.inventory[choice][1]>=quantity_to_sell>=0)
 									break
 								except:
-									print ("That is not a valid amount. Please use an amount between 1 and " + 
-										str(player.inventory[choice][1]) + ".")
+									print "ERROR: You only have {} of those!".format(player.inventory[choice][1])
 										
 							if quantity_to_sell == 0: break
 							elif quantity_to_sell >1:
@@ -422,18 +413,19 @@ class Shop(object):
 								total_sell_price = 0
 								while (quantity_to_sell > 0):
 									if (item_to_sell in player.eq_items) and (player.inventory[choice][1]==1):
-										print "Please unequip your {} before selling it.".format(item_to_sell)
+										print "ERROR: You must unequip your {} before selling it.".format(item_to_sell)
 										break
 									else:
+										print sell_price ###
 										total_sell_price += sell_price
 										player.inventory_remove(item_to_sell)
 										quantity_sold +=1
 										quantity_to_sell -= 1
 								player.gold += total_sell_price
 								if quantity_sold > 1:
-									print "The shopkeeper hands you {0} gold for {1} {2}s.".format(str(total_sell_price), str(quantity_sold), item_to_sell)
+									print "The shopkeeper hands you {0} gold for {1} {2}s.".format(total_sell_price, quantity_sold, item_to_sell)
 								elif quantity_sold != 0:
-									print "The shopkeeper hands you {0} gold for the {1}.".format(str(total_sell_price), item_to_sell)						
+									print "The shopkeeper hands you {0} gold for the {1}.".format(total_sell_price, item_to_sell)						
 							else:
 								print "You do not sell your {}.".format(item_to_sell)
 							raw_input("<Press \"Enter\" to continue.>")
@@ -443,7 +435,7 @@ class Shop(object):
 						print "__"*5 
 						break								
 			else:
-				print "That is not a valid response."
+				print "ERROR: That is not a valid response."
 				
 class Arena(object):
 	def __init__(self):
@@ -524,7 +516,7 @@ class Arena(object):
 							break
 						assert (self.bet_range[1]>=choice_wager>=self.bet_range[0])
 						if choice_wager>player.gold:
-							print "You don't have that much gold to bet!  (Gold: {})".format(str(player.gold))
+							print "You don't have that much gold to bet!  (Gold: {})".format(player.gold)
 						else:
 							break
 					except:
@@ -576,7 +568,7 @@ class Character(object):
 			
 			print "Please choose a race to play by selecting a number:"
 			for i in range(len(race_options)):
-				print "     ",str(i+1)+".)", race_options[i] 
+				print "     {}.) {}".format(i+1,race_options[i]) 
 			while (True):
 				try:
 					temp = int(raw_input("--"))
@@ -584,7 +576,7 @@ class Character(object):
 					self.race = race_options[temp-1]
 					break
 				except:
-					print "ERROR: Please select a number from 1 to " +str(len(race_options))+ ".\n"
+					print "ERROR: Please select a number from 1 to {}.\n".format(len(race_options))
 					
 			print "Please choose a class to play by selecting a number:"
 			for i in range (len(class_options)):
@@ -596,7 +588,7 @@ class Character(object):
 					self.cclass = class_options[temp-1]
 					break
 				except:
-					print "ERROR: Please select a number from 1 to " +str(len(class_options))+ ".\n"
+					print "ERROR: Please select a number from 1 to {}.\n".format(len(class_options))
 			print "__"*20			
 			self.erase() #Sets up/Resets character's stats. 
 			print "Your randomly generated stats are as follows:"
@@ -668,7 +660,7 @@ class Character(object):
 		if (self.level%4==0):
 			print "\nCurrent Abilities:"
 			for i in range(len(self.ability_modifiers)):
-				print str(i+1) + ".) " + stat_names[i] + ": " + str(self.stats[i])
+				print "{}.) {}: {}".format(i+1,stat_names[i],self.stats[i])
 			print "\nPlease select an ability to increase by one:"
 			while (True):
 				try:
@@ -694,7 +686,8 @@ class Character(object):
 					item_status = "(Equipped)"
 				else:
 					item_status = ""
-				print "     ",str(i+1)+".)",self.inventory[i][0], "x", str(self.inventory[i][1]), item_status
+				###print "     ",str(i+1)+".)",self.inventory[i][0], "x", str(self.inventory[i][1]), item_status
+				print "     {}.) {} x {} {}".format(i+1,self.inventory[i][0],self.inventory[i][1], item_status)
 		print "Coin Purse: " + str(self.gold) + " gold"
 		print "\nTo use/equip an item, type its number. To leave your inventory, type \"0\"." 
 		while (True):
