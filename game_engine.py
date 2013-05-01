@@ -78,6 +78,7 @@ class Control(object):
 				self.description += ("To your left and right lie separate clearings in the jungle.")
 		elif (plot_point==1.3):
 			listen_check = d(20) + player.ability_modifiers[3]#Wisdom
+			if listen_check<=0: listen_check = 1 #Checks cannot be below 1.
 			if "Cardinal Directions" in player.knowledge:
 				self.options += ["Wander East", "Wander West"]
 				self.description += ("There are lovely flowers growing here. They smell like fall.")
@@ -145,6 +146,7 @@ class Control(object):
 		elif (plot_point==4):
 			generate_random_encounter(10, 3, "Field")
 			wisdom_check = d(20)+player.ability_modifiers[3]#Wisdom
+			if wisdom_check<=0: wisdom_check = 1 #Checks cannot be below 1.
 			if "Cardinal Directions" in player.knowledge:
 				self.options = ["Travel West", "Travel North", "Travel South"]
 			elif wisdom_check >=14:
@@ -165,7 +167,8 @@ class Control(object):
 				self.battle_description = generate_fight_sequence("pre_battle")
 				self.battle_active=True	
 		elif (plot_point==7.1):
-			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
+			spot_check = d(20)+player.ability_modifiers[3]#Spot
+			if spot_check<=0: spot_check = 1 #Checks cannot be below 1.
 			item_found = random.choice(item_details.keys()) #Randomly chooses an item.
 			if (spot_check>=15):
 				#Find a Weapon.
@@ -184,15 +187,17 @@ class Control(object):
 		elif (plot_point==8):
 			player.knowledge = player.knowledge.union({"Cardinal Directions"})
 		elif (plot_point==15.1):
-			int_check = d(20)+player.ability_modifiers[4]#Wisdom
-			if (int_check>=25):
+			int_check = d(20)+player.ability_modifiers[4]#Int
+			if int_check<=0: int_check = 1 #Checks cannot be below 1.
+			if (int_check>=20):
 				self.description = ("A fist-sized diamond falls out of the sky and into your inventory (Seriously?).")
 				player.inventory_add("Diamond", 1)
 			else:
 				self.description = "You meditate for a while, but nothing happens."
 			self.description += ("\n(Intelligence check of: "+str(int_check) + ")")
 		elif (plot_point==16.1):
-			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
+			spot_check = d(20)+player.ability_modifiers[3]#Spot
+			if spot_check<=0: spot_check = 1 #Checks cannot be below 1.
 			if (spot_check>=14):
 				self.description = ("You find a hole that you could squeeze into...")
 				self.options += ["Seriously? Nope. Turn Around.", "Squeeze in..."]
@@ -202,6 +207,7 @@ class Control(object):
 			self.description += ("\n(Spot check of: "+str(spot_check) + ")")
 		elif (plot_point==17.1):
 			spot_check = d(20)+player.ability_modifiers[3]#Wisdom
+			if spot_check<=0: spot_check = 1 #Checks cannot be below 1.
 			item_found = random.choice(item_details.keys()) #Randomly chooses an item.
 			if (spot_check>=15):
 				#Find a Weapon.
@@ -267,7 +273,7 @@ class Control(object):
 				self.ask_question=True
 			
 		else: #GENERAL CASES:
-			if plot_point in {9, 12, 15}: generate_random_encounter(10, player.level, "Field")
+			if plot_point in {9, 12, 15, 13}: generate_random_encounter(10, player.level, "Field")
 			elif plot_point in {202,203,204,205}: generate_random_encounter(30, 1, "Water_Dungeon") #Water Dungeon
 		
 		"""GENERAL TOWN OPTIONS"""
@@ -286,7 +292,7 @@ class Control(object):
 			arena.activate()
 			self.change_to(101)
 		elif (plot_point==113): #"55,50"
-			arena.change_to("Mole Arena of Death")
+			arena.change_to("Mole Arena of Pain")
 			arena.activate()
 			self.change_to(111)
 				
@@ -486,7 +492,7 @@ class Arena(object):
 					if choice[0]=="w": arena_mode="w"
 					break
 				except:
-					print "That is an invalid option. Please type \"p\",\"w\", or \"0\"."
+					print "ERROR: Please type \"p\",\"w\", or \"0\"."
 			if choice == "0":
 				break
 			print "How many opponents would you like to battle?"
@@ -500,7 +506,7 @@ class Arena(object):
 					else:	
 						break
 				except:
-					print "That is an invalid input. Please choose an integer between 1 and {}.".format(self.enemy_quantity_lim)
+					print "ERROR: Please choose an integer between 1 and {}.".format(self.enemy_quantity_lim)
 			print "And how tough do you want'em?"
 			while (True):
 				try:
@@ -515,7 +521,7 @@ class Arena(object):
 				except:
 					print "Please choose a challenge rating between 1 and {}.".format(self.chal_rating_max)
 			if arena_mode=="w": #Wager
-				print "Heh... And what's y'er wager?"
+				print "Heh... And what's y'er wager? (Gold: {})".format(player.gold)
 				while (True):
 					try:
 						#Bet:
@@ -536,7 +542,7 @@ class Arena(object):
 							arena_mode="p"
 							break
 						else:
-							print "Please choose a bet between {} and {}.".format(self.bet_range[0],self.bet_range[1])
+							print "ERROR: This arena only accepts bets between {} and {} gold.".format(self.bet_range[0],self.bet_range[1])
 			
 			#Generate random enemies. 
 			generate_random_encounter(100, choice_chal_rating, "Arena", choice_quantity)
@@ -951,13 +957,12 @@ def battle_turn():
 		print str(i+1) + ".) " + live_enemies[i].name + " (Health: "+str(live_enemies[i].hp)+")"
 	print "\nHealth: " + str(player.hp) + "/" + str(player.hp_max) + "\n\"Attack\" or \"inventory\"?"
 	while (True):
-		unparsed_choice = raw_input("--")
-		unparsed_choice = unparsed_choice.split()
+		unparsed_choice = raw_input("--").split()
 		try:
 			choice = str(unparsed_choice[0]).lower()
 			assert choice in {"attack", "a", "inventory", "i", "0"}
 		except:
-			print "Invalid input: please choose \"attack\" or \"inventory\"."
+			print "Invalid input: Please choose \"attack\" or \"inventory\"."
 			continue
 		
 		if choice == "inventory" or choice == "i" or choice == "0":
@@ -987,7 +992,7 @@ def battle_turn():
 				while (True):
 					try:
 						if len(unparsed_choice)>1:
-							print "(Invalid enemy number.)"
+							print "(ERROR: Invalid shortcut input. Please use \"a enemy_#\" in the future.)"
 							unparsed_choice = [] #Prevents repeats if user re-enters bad input.
 						
 						#Traditional Method:
@@ -997,9 +1002,9 @@ def battle_turn():
 						break
 					except:
 						if len(live_enemies)>1:
-							print "That is not a valid response. Please choose a number between \"1\" and \"{}\".".format(str(len(live_enemies)))
+							print "ERROR: Please choose a number between \"1\" and \"{}\".".format(str(len(live_enemies)))
 						else:
-							print "That is not a valid response. The only option is \"1\"."
+							print "ERROR: The only choice is \"1\"."
 				
 			#Update fight style (and remove arrow per attack if applicable).
 			if player.active_ammo != "None": 

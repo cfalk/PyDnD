@@ -58,7 +58,7 @@ scene_database = {
 			["Go West","Go North", "Go East"], [10, 12, 15], "52,54"],
 	12  	:["You come to another crossroads. To the North you can see smoke.",
 			["Go North", "Go South", "Go West"], [13, 11, 9], "54,51"],
-	13  	:["There is a large guard tower on the eastern side of the road. You can hear guards yelling inside.",
+	13  	:["There is a large guard tower on the eastern side of the road.",
 			["Go North", "Go South", "Knock on the Tower Door"], [14, 12, 18], "54,50"],
 	14  	:["You arrive at the front gate of Townington. You can see a burly man arm wrestling himself outside a nearby inn.",
 			["Explore the Town", "Leave Townington", "Approach the Man"], [101, 13, 14.1], "54,49"],
