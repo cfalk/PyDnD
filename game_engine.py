@@ -217,20 +217,28 @@ class Control(object):
 			else:
 				self.description += ("The smoldering fire is old -- but not... TOO... old.")
 			self.description += ("(Spot check of: "+str(spot_check) + ")")
-		elif (plot_point==18.2):
-			if not plot_point in self.game_path:
-				player.inventory_add("Dwarven Ale", d(5))
-				player.inventory_add("Troll Grog", d(4))
-				self.description = "Surprisingly, all you can find is Dwarven Ale and Troll Grog. You help yourself."
+		elif (plot_point==18):
+			if  18.1 in self.game_path or 18.2 in self.game_path: #If the player begged or attacked the guards before.
+				self.description = "The door is locked... You feel left out..."
+				self.options 	 = ["Turn and Leave..."]
 			else:
-				self.description = "The tower is still empty from your last pillaging."
-		elif (plot_point==18.4):
+				self.description = "Some drunk guards open the door. You feel mildly intoxicated just breathing the air around them."
+				self.options 	 = ["Apologize for Interrupting and Leave", "Ask for Gold", "Pick a Fight"]
+		elif (plot_point==18.2):
 			if not plot_point in self.game_path:
 				for i in range(d(2)+3):
 					Monster("Guard", 6)
 				self.battle_description = generate_fight_sequence("pre_battle")
 				self.battle_active=True	
 				self.description += "\nYou have successfully become a criminal. Way to go."
+		elif (plot_point==18.4):
+			if not plot_point in self.game_path:
+				#Loot Tower
+				player.inventory_add("Dwarven Ale", d(5))
+				player.inventory_add("Troll Grog", d(4))
+				self.description = "Surprisingly, all you can find is Dwarven Ale and Troll Grog. You help yourself."
+			else:
+				self.description = "The tower is still empty from your last pillaging."
 		elif (plot_point==206):
 			if plot_point in self.game_path:
 				#Generate random battle
@@ -267,16 +275,20 @@ class Control(object):
 		if (plot_point==102): #"54,48"
 			shop.change_to("Townington Emporium")
 			shop.activate()
+			self.change_to(101) #Go back to the public district.
 		elif (plot_point==112): #"55,50"
 			shop.change_to("Mole Forge")
 			shop.activate()
+			self.change_to(111)
 		#Arena Containers
 		if (plot_point==103): #"54,48"
 			arena.change_to("Townington Fight Club")
 			arena.activate()
+			self.change_to(101)
 		elif (plot_point==113): #"55,50"
 			arena.change_to("Mole Arena of Death")
 			arena.activate()
+			self.change_to(111)
 				
 		#Update game log while keeping most recent events closer to the head of the list.
 		self.game_path.insert(0,plot_point)
@@ -327,11 +339,11 @@ class Shop(object):
 					print "\nShop's Wares:  (Your Gold: " + str(player.gold) + ")"
 					for i in range(len(self.inventory)): #List the shop wares.
 						if self.buy_quantities[i]>1:
-							print ("     "+str(i+1) + ".) " + self.inventory[i] + " x " + str(self.buy_quantities[i]) + " -- Price: " +
-							 str(int(round(self.prices[i]*effective_buy_percentage))) + " Gold")
+							print ("     {}.) {} x {}".format(i+1, self.inventory[i],self.buy_quantities[i]) +
+							" -- Price: {} Gold".format(int(round(self.prices[i]*effective_buy_percentage))))
 						else:
-							print ("     "+str(i+1) + ".) " + self.inventory[i] + " -- Price: " +
-							 str(int(round(self.prices[i]*effective_buy_percentage))) + " Gold")		
+							print ("     {}.) {}".format(i+1, self.inventory[i], int(round(self.prices[i]*effective_buy_percentage))) +
+							" -- Price: {} Gold".format(int(round(self.prices[i]*effective_buy_percentage))))
 					while (True):				
 						try:
 							choice = int(raw_input("--"))-1
@@ -357,9 +369,9 @@ class Shop(object):
 							print "You do not complete the purchase."
 						elif (purchase_total<=player.gold):
 							if quantity_to_buy>1:
-								q = "Are you sure you want to buy {0} {1}s for {2} gold?".format(quantity_to_buy, item_to_buy, purchase_total)
+								q = "Are you sure you want to buy {} {}s for {} Gold?".format(quantity_to_buy, item_to_buy, purchase_total)
 							else:
-								q = "Are you sure you want to buy the {0} for {1} gold?".format(item_to_buy, purchase_total)
+								q = "Are you sure you want to buy the {} for {} Gold?".format(item_to_buy, purchase_total)
 							if binary_question(q):
 								player.inventory_add(item_to_buy,quantity_to_buy)
 								player.gold -= purchase_total
@@ -377,9 +389,9 @@ class Shop(object):
 						for i in range(len(player.inventory)):
 							item = player.inventory[i][0]
 							if player.inventory[i][1]==1:
-								print "     {}.) {} -- Offer:{}".format(i+1, item, int(round(player.inventory[i][3]*effective_sell_percentage)))
+								print "     {}.) {} -- Offer: {} gold".format(i+1, item, int(round(player.inventory[i][3]*effective_sell_percentage)))
 							else:
-								print ("     {}.) {} -- Offer:{}".format(i+1, item, int(round(player.inventory[i][3]*effective_sell_percentage))) +
+								print ("     {}.) {} -- Offer: {} gold".format(i+1, item, int(round(player.inventory[i][3]*effective_sell_percentage))) +
 									" ({} in inventory)".format(player.inventory[i][1]))
 						while (True):
 							try:
@@ -416,7 +428,6 @@ class Shop(object):
 										print "ERROR: You must unequip your {} before selling it.".format(item_to_sell)
 										break
 									else:
-										print sell_price ###
 										total_sell_price += sell_price
 										player.inventory_remove(item_to_sell)
 										quantity_sold +=1
@@ -528,7 +539,7 @@ class Arena(object):
 							print "Please choose a bet between {} and {}.".format(self.bet_range[0],self.bet_range[1])
 			
 			#Generate random enemies. 
-			generate_random_encounter(100,choice_chal_rating,"Arena")
+			generate_random_encounter(100, choice_chal_rating, "Arena", choice_quantity)
 			
 			#Battle Protocol (mainly copied from game loop)
 			if (scene.battle_active):
@@ -539,14 +550,14 @@ class Arena(object):
 				if (player.hp <= 0):
 					print "\nYou fall to the ground unconscious!"
 					print "You wake up battered and defeated in a rickety bed."
-					player.hp = 1 #IE: player can't die in arena.
+					player.hp = 1 #IE: player shouldn't die in arena.
 					if arena_mode=="w": 
 						print "Your coinpurse feels lighter."
 						player.gold -= choice_wager
 				else:
 					collect_loot()
-					player.refresh_stats()
-					print "\nYou take your spoils and walk out of the pit."
+					print "__"*10
+					print "YOU ARE VICTORIOUS!\nYou walk out of the arena with feeling the glory of a true hero."
 					if arena_mode=="w":
 						print "You earn {} gold from your battle!".format(choice_wager)
 						player.gold += choice_wager
@@ -603,7 +614,7 @@ class Character(object):
 			self.level_up() #Forces level-up from 0 to 1.
 			print "__"*10
 			
-			question = "Is the character, {} the {}, to your liking?".format(self.name, self.race, self.cclass)
+			question = "Is the character, {} the {} {}, to your liking?".format(self.name, self.race, self.cclass)
 			if binary_question(question):
 				break
 			else:
@@ -923,6 +934,7 @@ def collect_loot():
 		if (experience_earned>0):
 			print "You earned " + str(experience_earned) + " experience!"
 			player.experience += experience_earned
+		player.refresh_stats()#Refresh stats in case of level up.
 		temp = raw_input("<Press \"Enter\" to continue.>")
 				
 			
@@ -1096,7 +1108,7 @@ def generate_fight_sequence(mode):
 		6:"-The {0} lunges!".format(temp2.name),
 		}[temp]
 		
-def generate_random_encounter(chance_to_occur, max_challenge_rating, environment):
+def generate_random_encounter(chance_to_occur, max_challenge_rating, environment, num_enemies =0):
 	if d(100) <= chance_to_occur:
 		if environment=="Field":
 			if max_challenge_rating == 10:
@@ -1130,25 +1142,31 @@ def generate_random_encounter(chance_to_occur, max_challenge_rating, environment
 				possible_encounters = ["Marauder", "Goblin", "Lycan"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
 				max_enemy_level   = d(player.level)+4
-				number_of_enemies = d(player.level/5+1)
 			elif max_challenge_rating >=8:
 				possible_encounters = ["Marauder", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level)+2
-				number_of_enemies = d(player.level/2+2)		
 			elif max_challenge_rating >=5:
 				possible_encounters = ["Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level/2)+2
-				number_of_enemies = d(player.level/3+2)+d(max_challenge_rating)	
 			else: #max_challenge_rating < 5:	
 				possible_encounters = ["ROUS", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]
 				max_enemy_level   = d(player.level/4+1)+2
-				number_of_enemies = d(player.level/4+max_challenge_rating+1)
+				
+		#Generate a supplied/random number of enemies from input
+		try:
+			#If a valid integer number of enemies is given.
+			assert(num_enemies>0 and type(num_enemies)==type(1))
+			number_of_enemies = num_enemies
+		except:
+			pass #number_of_enemies should be generated above directly instead of being supplied.
+		
 		while number_of_enemies > 0:
 			Monster(specific_enemy, max_enemy_level)
 			number_of_enemies -= 1
+			
 		#Initiate Battle
 		scene.battle_active = True
 		scene.battle_description += generate_fight_sequence("pre_battle")

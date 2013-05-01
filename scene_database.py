@@ -76,12 +76,12 @@ scene_database = {
 			["Explore/loot the Camp", "Leave the Camp"], [17.1, 10], "54,49"],
 	17.1	:["N/A",
 			["Leave the Camp"], [10], "53,49_looted"],
-	18  	:["Some drunk guards open the door. You feel mildly intoxicated just breathing the air around them.",
-			["Apologize for Interrupting and Leave", "Ask for Gold", "Pick a Fight"], [13, 18.1, 18.2], "54,50_guard"],
+	18  	:["N/A",
+			[], [13, 18.1, 18.2], "54,50_guard"],
 	18.1  	:["The door slams in your face. That seemed strangely familiar...",
 			["Knock Again", "Leave the Tower"], [18.3, 13], "54,50_guard"],
-	18.2  	:["The guard house appears to be empty.",
-			["Loot!", "Leave the Tower"], [18.4, 13], "54,50_guard"],
+	18.2  	:["N/A",
+			["Loot the Tower", "Leave the Tower"], [18.4, 13], "54,50_guard"],
 	18.3  	:["There is no response.",
 			["Knock Again", "Leave the Tower"], [18.3, 13], "54,50_guard"],
 	18.4  	:["N/A",
@@ -89,15 +89,15 @@ scene_database = {
 	#TOWNS:
 	101 	:["You enter the glorious public district of Townington!",
 			["Find the Arena", "Find a Shop","Leave the Public District"], [103, 102, 14], "54,48"],
-	102 	:["SHOP",
+	102 	:["",#SHOP
 			[], [], "54,48"],
-	103 	:["ARENA",
+	103 	:["",#ARENA
 			[], [], "54,48"],
 	111 	:["You enter the hidden underground city of the Mole People!",
 			["Find an Arena", "Find a Shop","Return to the Surface"], [113, 112, 16], "50,55"],
-	112 	:["SHOP",
+	112 	:["",#SHOP
 			[], [], "50,55"],
-	113 	:["ARENA",
+	113 	:["",#ARENA
 			[], [], "50,55"],
 	#DUNGEONS:
 	201 	:["The waterfall roars next to you as you peer into the black cave.",
