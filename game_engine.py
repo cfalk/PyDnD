@@ -386,7 +386,7 @@ class Shop(object):
 								print "You do not complete the purchase."
 						else:
 							print "You cannot afford that purchase!"
-						raw_input("<Press \"Enter\" to continue.>")
+						raw_input("     <Press \"Enter\" to continue.>")
 						print "__"*5 
 			elif choice.lower() == "sell" or choice.lower() == "s":
 				while (True):
@@ -445,10 +445,10 @@ class Shop(object):
 									print "The shopkeeper hands you {0} gold for the {1}.".format(total_sell_price, item_to_sell)						
 							else:
 								print "You do not sell your {}.".format(item_to_sell)
-							raw_input("<Press \"Enter\" to continue.>")
+							raw_input("     <Press \"Enter\" to continue.>")
 					else:
 						print "\nYou have nothing to sell!"
-						raw_input("<Press \"Enter\" to continue.>")
+						raw_input("     <Press \"Enter\" to continue.>")
 						print "__"*5 
 						break								
 			else:
@@ -551,7 +551,7 @@ class Arena(object):
 			if (scene.battle_active):
 				while (len(live_enemies)>0 and player.hp>0):
 					battle_turn()
-					raw_input("<Press \"Enter\" to continue.>")
+					raw_input("     <Press \"Enter\" to continue.>")
 				scene.battle_active = False 
 				if (player.hp <= 0):
 					print "\nYou fall to the ground unconscious!"
@@ -703,7 +703,6 @@ class Character(object):
 					item_status = "(Equipped)"
 				else:
 					item_status = ""
-				###print "     ",str(i+1)+".)",self.inventory[i][0], "x", str(self.inventory[i][1]), item_status
 				print "     {}.) {} x {} {}".format(i+1,self.inventory[i][0],self.inventory[i][1], item_status)
 		print "Coin Purse: " + str(self.gold) + " gold"
 		print "\nTo use/equip an item, type its number. To leave your inventory, type \"0\"." 
@@ -717,7 +716,7 @@ class Character(object):
 					player_choice = temp-1
 					self.inventory_use(self.inventory[player_choice][0])
 			except:
-				print "That is not a valid input."
+				print "ERROR: That is not a valid input."
 		print "__"*10
 	def inventory_use(self,item):
 		try:
@@ -794,7 +793,7 @@ class Character(object):
 				assert(int(raw_input("--"))==0)
 				break
 			except:
-				print "That is not a valid input."
+				print "ERROR: That is not a valid input."
 		print "__"*10
 			
 class Monster(object):
@@ -818,7 +817,7 @@ class Monster(object):
 		
 		if attack_roll>=self.AC:
 			self.hp -= damage
-			print "\nYou do " + str(damage) + " damage to the " + self.name + "."
+			print "\n--You do " + str(damage) + " damage to the " + self.name + "."
 		else:
 			print "\n"+generate_fight_sequence(scene.fight_style).format(self.name)
 		
@@ -941,7 +940,7 @@ def collect_loot():
 			print "You earned " + str(experience_earned) + " experience!"
 			player.experience += experience_earned
 		player.refresh_stats()#Refresh stats in case of level up.
-		temp = raw_input("<Press \"Enter\" to continue.>")
+		temp = raw_input("     <Press \"Enter\" to continue.>")
 				
 			
 	else:
@@ -1034,7 +1033,7 @@ def battle_turn():
 		enemy_attack_roll = d(20)
 		if (enemy_attack_roll >= player.AC):
 			enemy_damage_roll = d(i.damage)
-			print "-The " + i.name + " hits you for " + str(enemy_damage_roll) + " damage!"
+			print "--The " + i.name + " hits you for " + str(enemy_damage_roll) + " damage!"
 			player.hp -= enemy_damage_roll
 		else:
 			print generate_fight_sequence("enemy").format(i.name)
@@ -1052,68 +1051,68 @@ def generate_fight_sequence(mode):
 	if (mode == "enemy"):
 		temp = d(5)
 		return {
-		1:"-You dodge {0}'s attack!",
-		2:"-The {0} knicks you, but it's only a flesh wound.",
-		3:"-You jump out of the {0}'s blow!",
-		4:"-The {0} misses!",
-		5:"-The {0}'s attack falls short!",
+		1:"--You dodge {0}'s attack!",
+		2:"--The {0} knicks you, but it's only a flesh wound.",
+		3:"--You jump out of the {0}'s blow!",
+		4:"--The {0} misses!",
+		5:"--The {0}'s attack falls short!",
 		}[temp]
 	if (mode == "char_melee"):
 		temp = d(5)
 		return {
-		1:"-Your attack misses!",
-		2:"-The {0} dodges your attack!",
-		3:"-Your attack is blocked by the {0}!",
-		4:"-The {0} jumps out of your line of attack.",
-		5:"-The {0} side-steps!",
+		1:"--Your attack misses!",
+		2:"--The {0} dodges your attack!",
+		3:"--Your attack is blocked by the {0}!",
+		4:"--The {0} jumps out of your line of attack.",
+		5:"--The {0} side--steps!",
 		}[temp]
 	if (mode == "char_ranged"):
 		temp = d(6)
 		return {
-		1:"-Your attack misses!",
-		2:"-The {0} dodges your attack!",
-		3:"-Your shot flies over the {0}'s head!",
-		4:"-The {0} jumps out of your line of fire.",
-		5:"-The {0} side-steps and your shot misses!",
-		6:"Your attack lands on the ground a few feet from the {0}.",
+		1:"--Your attack misses!",
+		2:"--The {0} dodges your attack!",
+		3:"--Your shot flies over the {0}'s head!",
+		4:"--The {0} jumps out of your line of fire.",
+		5:"--The {0} side--steps and your shot misses!",
+		6:"--Your attack lands on the ground a few feet from the {0}.",
 		}[temp]
 	if (mode == "enemy_dead"):
 		temp = d(4)
 		return {
-		1:"-You fatally wound the {0}",
-		2:"-The {0} falls to the ground.",
-		3:"-The {0} collapses under your blow!",
-		4:"-The {0} clutches his wound and dies.",
+		1:"--You fatally wound the {0}",
+		2:"--The {0} falls to the ground.",
+		3:"--The {0} collapses under your blow!",
+		4:"--The {0} clutches his wound and dies.",
 		} [temp]
 	if (mode == "pre_battle"):
 		if (len(live_enemies)==1):
 			temp = d(3)
 			return {
-			1:"-A {0} runs at you!".format(live_enemies[0].name),
-			2:"-You encounter a wild {0}!".format(live_enemies[0].name),
-			3:"-A {0} approaches you -- weapon drawn!".format(live_enemies[0].name),
+			1:"--A {0} runs at you!".format(live_enemies[0].name),
+			2:"--You encounter a wild {0}!".format(live_enemies[0].name),
+			3:"--A {0} approaches you -- weapon drawn!".format(live_enemies[0].name),
 			}[temp]
 		if (len(live_enemies)>1):
 			temp = d(3)
 			temp2 = random.choice(live_enemies) #Functionally, the same thing as above since only homogeneous groups are created.
 			return {
-			1:"-You encounter some {0}s!".format(temp2.name),
-			2:"-{0}s surround you!".format(temp2.name),
-			3:"-{0}s ambush you!".format(temp2.name),
+			1:"--You encounter some {0}s!".format(temp2.name),
+			2:"--{0}s surround you!".format(temp2.name),
+			3:"--{0}s ambush you!".format(temp2.name),
 			}[temp]			
 	if (mode == "mid_battle"):
 		temp = d(6)
 		temp2 = random.choice(live_enemies)
 		return {
-		1:"-The {0} runs at you!".format(temp2.name),
-		2:"-The {0} eyes you menacingly...".format(temp2.name),
-		3:"-You throw a mean look at the {0}.".format(temp2.name),
-		4:"-The {0} tries to flank you!".format(temp2.name),
-		5:"-You manage to catch the {0} off guard!".format(temp2.name),
-		6:"-The {0} lunges!".format(temp2.name),
+		1:"--The {0} runs at you!".format(temp2.name),
+		2:"--The {0} eyes you menacingly...".format(temp2.name),
+		3:"--You throw a mean look at the {0}.".format(temp2.name),
+		4:"--The {0} tries to flank you!".format(temp2.name),
+		5:"--You manage to catch the {0} off guard!".format(temp2.name),
+		6:"--The {0} lunges!".format(temp2.name),
 		}[temp]
 		
-def generate_random_encounter(chance_to_occur, max_challenge_rating, environment, num_enemies =0):
+def generate_random_encounter(chance_to_occur, max_challenge_rating, environment, num_enemies = 0):
 	if d(100) <= chance_to_occur:
 		if environment=="Field":
 			if max_challenge_rating == 10:
@@ -1130,7 +1129,7 @@ def generate_random_encounter(chance_to_occur, max_challenge_rating, environment
 				possible_encounters = ["Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]	
 				max_enemy_level   = d(player.level/2+1)+2
-				number_of_enemies = d(player.level/3+2)+d(max_challenge_rating)	
+				number_of_enemies = d(player.level/3+2)	
 			else: #max_challenge_rating < 5:	
 				possible_encounters = ["ROUS", "Goblin", "Kobold"]
 				specific_enemy = possible_encounters[d(len(possible_encounters))-1]

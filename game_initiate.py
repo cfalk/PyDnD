@@ -13,7 +13,7 @@ while (game_status=="Play"):
 	if (scene.battle_active):
 		while (len(live_enemies)>0 and player.hp>0):
 			battle_turn()
-			raw_input("<Press \"Enter\" to continue.>")
+			raw_input("     <Press \"Enter\" to continue.>")
 		scene.battle_active = False 
 		if (player.hp <= 0):
 			game_status="Lost"

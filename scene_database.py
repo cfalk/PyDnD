@@ -10,7 +10,7 @@
 scene_database = {
 	#GENERAL SCENES:
 	0  		:["You wake up to find your clothes soaked and torn.\n"+
-				"Wherever you turn, the cackling of archaic voices seems to grow louder.\n"+
+				"Wherever you turn, the cackling of strange voices seems to grow louder.\n"+
 				"You cannot tell where you are and you cannot remember what brought you here.\n"+
 				"\n[Menu Commands: Inventory(0) and Character Status(9)]\n",
 			["Spot", "Sleep", "Listen"], [1.1, 1.2, 1.3], "50,50_start"],
